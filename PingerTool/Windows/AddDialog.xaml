@@ -14,6 +14,7 @@
     <Window.DataContext>
         <local:AddDialogModel/>
     </Window.DataContext>
+    
     <Grid>
         <Label Content="IP Address:" HorizontalAlignment="Left" Margin="10,20,0,0" VerticalAlignment="Top"/>
         <TextBox Text="{Binding IPAddress}" HorizontalAlignment="Left" Height="23" Margin="144,23,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="236" Padding="5,2,0,0"/>

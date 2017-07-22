@@ -4,27 +4,41 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:fa="http://schemas.fontawesome.io/icons/"
+             xmlns:local="clr-namespace:PingerTool.Controls"
              d:DesignHeight="300"
              d:DesignWidth="500"
              mc:Ignorable="d">
+    <d:UserControl.DataContext>
+        <!-- Using d prefix so model is bound in designer only. Actual DataContext is bound by ItemsControl in MainWindow.xaml -->
+        <local:PingControlModel />
+    </d:UserControl.DataContext>
+    
     <Grid Background="White">
         <Grid.RowDefinitions>
             <RowDefinition Height="70"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        
+
         <!-- Upper Container -->
         <Grid Grid.Row="0">
-            <fa:FontAwesome Icon="Circle" Foreground="{Binding Model.Colour}" FontSize="20" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10,10,0,0" />
-            <Label Content="Test Control" HorizontalAlignment="Left" Margin="30,4,0,0" VerticalAlignment="Top" FontSize="19" FontFamily="Segoe UI Light"/>
-            <Label ContentStringFormat="Last Contact: {0}" Content="Just Now" HorizontalAlignment="Left" Margin="8,35,0,0" VerticalAlignment="Top" FontSize="14" FontFamily="Segoe UI Light"/>
+            <fa:FontAwesome Icon="Circle" Foreground="{Binding Colour}" FontSize="18" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="12,12,0,0" />
+            <Label HorizontalAlignment="Left" Margin="35,2,0,0" VerticalAlignment="Top" FontSize="19" FontFamily="Segoe UI Light">
+                <Label.Content>
+                    <TextBlock>
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat="{}{0} ({1})">
+                                <Binding Path="DisplayName" />
+                                <Binding Path="Address" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                </Label.Content>
+            </Label>
+            <Label ContentStringFormat="Last Contact: {0}" Content="{Binding LastContact}" HorizontalAlignment="Left" Margin="8,35,0,0" VerticalAlignment="Top" FontSize="14" FontFamily="Segoe UI Light"/>
         </Grid>
-        
+
         <!-- Ping Container -->
-        <TextBox Grid.Row="1" Background="Black" Foreground="White" FontSize="12" FontFamily="Consolas" Padding="2">
-            Reply from 127.0.0.1: bytes=32 time=1ms TTL=128
-            
-        </TextBox>
-            
+        <TextBox Grid.Row="1" Background="Black" Foreground="White" FontSize="12" FontFamily="Consolas" Padding="2" IsReadOnly="True" Text="{Binding DisplayContents}" />
+
     </Grid>
 </UserControl>

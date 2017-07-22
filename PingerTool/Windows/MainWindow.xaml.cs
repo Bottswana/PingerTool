@@ -5,6 +5,7 @@ using System.Windows;
 using Microsoft.Win32;
 using FontAwesome.WPF;
 using PingerTool.Classes;
+using PingerTool.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
 using System.Globalization;
@@ -185,12 +186,15 @@ namespace PingerTool.Windows
         public bool CreatePingElement(string HeaderName, IPAddress Address)
         {
             // Check it does not already exist
-            var Elements = _Model.PingWindows.Count( q => { return q.IP.Equals(Address); });
+            var Elements = _Model.PingWindows.Count( q => { return q.Address.Equals(Address); });
             if( Elements != 0 ) return false;
 
             // Add Model to Collection
-            var NewModel = new PingWindowModel(HeaderName, Address);
-            _Model.PingWindows.Add(NewModel);
+            _Model.PingWindows.Add(new PingControlModel()
+            {
+                DisplayName = HeaderName,
+                Address = Address
+            });
 
             // Update Column Count
             var TotalCount = _Model.PingWindows.Count;
@@ -208,11 +212,11 @@ namespace PingerTool.Windows
         public bool RemovePingElement(IPAddress Address)
         {
             // Check it exists
-            var Elements = _Model.PingWindows.Count(q => { return q.IP.Equals(Address); });
+            var Elements = _Model.PingWindows.Count(q => { return q.Address.Equals(Address); });
             if( Elements == 0 ) return false;
 
             // Remove Elements
-            foreach( var Element in _Model.PingWindows.Where(q => { return q.IP.Equals(Address); }) )
+            foreach( var Element in _Model.PingWindows.Where(q => { return q.Address.Equals(Address); }) )
             {
                 _Model.PingWindows.Remove(Element);
             }
@@ -234,12 +238,12 @@ namespace PingerTool.Windows
         public bool UpdatePingElement(IPAddress Address, string NewName)
         {
             // Check it exists
-            var Elements = _Model.PingWindows.Count(q => { return q.IP.Equals(Address); });
+            var Elements = _Model.PingWindows.Count(q => { return q.Address.Equals(Address); });
             if( Elements == 0 ) return false;
 
             // Remove Elements
-            var Element = _Model.PingWindows.First(q => { return q.IP.Equals(Address); });
-            Element.WindowName = NewName;
+            var Element = _Model.PingWindows.First(q => { return q.Address.Equals(Address); });
+            Element.DisplayName = NewName;
 
             return true;
         }
@@ -251,7 +255,7 @@ namespace PingerTool.Windows
         #region Initializer
         public MainWindowModel()
         {
-            PingWindows = new ObservableCollection<PingWindowModel>();
+            PingWindows = new ObservableCollection<PingControlModel>();
         }
         #endregion Initializer
 
@@ -265,7 +269,7 @@ namespace PingerTool.Windows
         /// <summary>
         /// Ping Window Collection
         /// </summary>
-        public ObservableCollection<PingWindowModel> PingWindows { get; set; }
+        public ObservableCollection<PingControlModel> PingWindows { get; set; }
 
         /// <summary>
         /// Current Application Version
@@ -324,56 +328,6 @@ namespace PingerTool.Windows
             }
         }
 
-        #endregion Public Properties
-    }
-
-    public class PingWindowModel : ViewModel
-    {
-        #region Initializer
-        public PingWindowModel(string WindowName, IPAddress Address)
-        {
-            _WindowName = WindowName;
-            IP = Address;
-        }
-        #endregion Initializer
-
-        #region Private Properties
-        private string _WindowName;
-        private IPAddress _IP;
-        #endregion Private Properties
-
-        #region Public Properties
-        public string WindowName
-        {
-            get
-            {
-                return _WindowName;
-            }
-            set
-            {
-                if( _WindowName != value )
-                {
-                    _WindowName = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-
-        public IPAddress IP
-        {
-            get
-            {
-                return _IP;
-            }
-            set
-            {
-                if( _IP != value )
-                {
-                    _IP = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
         #endregion Public Properties
     }
 

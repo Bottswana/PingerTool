@@ -16,6 +16,7 @@
     <Window.DataContext>
         <local:MainWindowModel />
     </Window.DataContext>
+    
     <Window.Resources>
 
         <!-- Custom Converter (Declared in MainWindow.xaml.cs) -->
