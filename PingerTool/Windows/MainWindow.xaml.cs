@@ -203,7 +203,7 @@ namespace PingerTool.Windows
             else if( TotalCount > 1 ) _Model.Columns = 2;
             else _Model.Columns = 1;
 
-            Proj.TriggerSaveStatus();
+            Proj?.TriggerSaveStatus();
             return true;
         }
 
@@ -230,7 +230,7 @@ namespace PingerTool.Windows
             else if( TotalCount > 1 ) _Model.Columns = 2;
             else _Model.Columns = 1;
 
-            Proj.TriggerSaveStatus();
+            Proj?.TriggerSaveStatus();
             return true;
         }
 
@@ -250,7 +250,7 @@ namespace PingerTool.Windows
             var Element = _Model.PingWindows.First(q => { return q.Address.Equals(Address); });
             Element.DisplayName = NewName;
 
-            Proj.TriggerSaveStatus();
+            Proj?.TriggerSaveStatus();
             return true;
         }
 

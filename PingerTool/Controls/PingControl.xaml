@@ -3,8 +3,11 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:classes="clr-namespace:PingerTool.Classes"
              xmlns:fa="http://schemas.fontawesome.io/icons/"
              xmlns:local="clr-namespace:PingerTool.Controls"
+             DataContextChanged="Window_DataContextChanged"
+             Unloaded="UserControl_Unloaded"
              d:DesignHeight="300"
              d:DesignWidth="500"
              mc:Ignorable="d">
@@ -38,7 +41,7 @@
         </Grid>
 
         <!-- Ping Container -->
-        <TextBox Grid.Row="1" Background="Black" Foreground="White" FontSize="12" FontFamily="Consolas" Padding="2" IsReadOnly="True" Text="{Binding DisplayContents}" />
+        <TextBox Grid.Row="1" Background="{Binding Colour}" Foreground="White" FontSize="12" FontFamily="Consolas" Padding="2" IsReadOnly="True" Text="{Binding DisplayContents}" classes:TextBoxUtilities.AlwaysScrollToEnd="True" />
 
     </Grid>
 </UserControl>
