@@ -16,9 +16,6 @@ using PingerTool.Windows;
 
 namespace PingerTool.Controls
 {
-    /// <summary>
-    /// Interaction logic for PingControl.xaml
-    /// </summary>
     public partial class PingControl : UserControl
     {
         public PingControl()

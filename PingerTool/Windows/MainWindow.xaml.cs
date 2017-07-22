@@ -169,7 +169,9 @@ namespace PingerTool.Windows
         /// </summary>
         private void _Settings_Click( object sender, RoutedEventArgs e )
         {
-
+            var Settings = new Settings(this);
+                Settings.Owner = this;
+                Settings.ShowDialog();
         }
         #endregion Window Events
 

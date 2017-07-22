@@ -5,16 +5,16 @@ using PingerTool.Classes;
 
 namespace PingerTool.Windows
 {
-	public partial class AddDialog
+	public partial class Settings
 	{
-        private AddDialogModel _Model;
+        private SettingsModel _Model;
 		private MainWindow _Window;
 
-		public AddDialog(MainWindow Window)
+		public Settings(MainWindow Window)
 		{
             InitializeComponent();
 
-            _Model = (AddDialogModel)DataContext;
+            _Model = (SettingsModel)DataContext;
 			_Window = Window;
 		}
 
@@ -24,6 +24,7 @@ namespace PingerTool.Windows
         /// </summary>
 		private void _Save_Click(object sender, RoutedEventArgs e)
 		{
+            /*
 			if( _Model.DisplayName.Length > 0 && _Model.IPAddress.Length > 0 )
 			{
                 // We need to convert the text IP to the IPAddress class.
@@ -38,7 +39,7 @@ namespace PingerTool.Windows
                     // Invalid IP
                     MessageBox.Show("The IP Address you entered is invalid", "Whoops", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
-			}
+			}*/
 		}
 
 		/// <summary>
@@ -51,45 +52,14 @@ namespace PingerTool.Windows
 		#endregion Window Events
 	}
 
-    class AddDialogModel : ViewModel
+    class SettingsModel : ViewModel
     {
         #region Private Properties
-        private string _DisplayName = "";
-        private string _IPAddress = "";
+
         #endregion Private Properties
 
         #region Public Properties
-        public string DisplayName
-        {
-            get
-            {
-                return _DisplayName;
-            }
-            set
-            {
-                if( _DisplayName != value )
-                {
-                    _DisplayName = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
 
-        public string IPAddress
-        {
-            get
-            {
-                return _IPAddress;
-            }
-            set
-            {
-                if( _IPAddress != value )
-                {
-                    _IPAddress = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
         #endregion Public Properties
     }
 }

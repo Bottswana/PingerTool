@@ -93,6 +93,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Windows\Settings.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Windows\AddDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -110,6 +114,9 @@
     <Compile Include="Classes\ViewModel.cs" />
     <Compile Include="Controls\PingControl.xaml.cs">
       <DependentUpon>PingControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\Settings.xaml.cs">
+      <DependentUpon>Settings.xaml</DependentUpon>
     </Compile>
     <Compile Include="Windows\AddDialog.xaml.cs">
       <DependentUpon>AddDialog.xaml</DependentUpon>

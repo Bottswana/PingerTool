@@ -18,8 +18,6 @@
             <fa:FontAwesome Icon="Circle" Foreground="{Binding Model.Colour}" FontSize="20" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10,10,0,0" />
             <Label Content="Test Control" HorizontalAlignment="Left" Margin="30,4,0,0" VerticalAlignment="Top" FontSize="19" FontFamily="Segoe UI Light"/>
             <Label ContentStringFormat="Last Contact: {0}" Content="Just Now" HorizontalAlignment="Left" Margin="8,35,0,0" VerticalAlignment="Top" FontSize="14" FontFamily="Segoe UI Light"/>
-
-
         </Grid>
         
         <!-- Ping Container -->
