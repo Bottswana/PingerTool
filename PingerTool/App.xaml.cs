@@ -1,20 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
 using System.IO;
-using System.Linq;
-using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
+using Microsoft.Win32;
+using System.Reflection;
 using PingerTool.Classes;
 using PingerTool.Windows;
-using Microsoft.Win32;
 
 namespace PingerTool
 {
-	#region Main Application
 	public partial class App
 	{
 		public Log Log;
@@ -58,6 +52,7 @@ namespace PingerTool
 		}
         #endregion Initialisation
 
+        #region Public Methods
 		/// <summary>
 		/// Get Application Instance
 		/// </summary>
@@ -182,12 +177,12 @@ namespace PingerTool
 				}
 			}
 		}
+        #endregion Public Methods
 	}
-    #endregion Main Application
 
-    #region Global Methods
 	static class Helpers
 	{
+        #region Global Helper Methods
 		public static void ExceptionHandler(object sender, UnhandledExceptionEventArgs e)
 		{
 			var Exception = ( e.ExceptionObject as Exception );
@@ -286,6 +281,6 @@ namespace PingerTool
 				return (long)( DateTime.UtcNow - epochStart ).TotalSeconds;
 			}
 		}
+        #endregion Global Helper Methods
 	}
-    #endregion Global Methods
 }

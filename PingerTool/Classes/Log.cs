@@ -8,69 +8,18 @@ using log4net.Repository.Hierarchy;
 
 namespace PingerTool.Classes
 {
-	#region Log Configurator
-	class LogInitiator
-	{
-		public static void ConfigureLog(string LogFileName, string LogLevel)
-		{
-			// Generic Configuration
-			Hierarchy hierarchy = (Hierarchy)LogManager.GetRepository();
-			hierarchy.Root.RemoveAllAppenders();
-
-			var PatternLayout = new PatternLayout()
-			{
-				ConversionPattern = "%date{dd MMM yyyy HH:mm:ss} [%-10c] %-5p:	%m%n"
-			};
-
-			// Get Logging Level
-			var LoggingLevel = hierarchy.LevelMap[LogLevel];
-			if( LoggingLevel == null )
-			{
-				LoggingLevel = Level.All;
-			}
-
-			// Configure Event Log
-			var EventLog = new EventLogAppender()
-			{
-				ApplicationName = "PingerTool",
-				Layout			= PatternLayout,
-				Threshold		= Level.Warn
-			};
-
-			// Configure File Log
-			var LogFile = new FileAppender()
-			{
-				File			= LogFileName,
-				LockingModel	= new FileAppender.MinimalLock(),
-				Layout			= PatternLayout,
-				#if DEBUG
-				Threshold		= Level.Debug,
-				#else
-				Threshold		= LoggingLevel,
-				#endif
-				AppendToFile	= true
-			};
-
-			// Activate Logging
-			PatternLayout.ActivateOptions();
-			EventLog.ActivateOptions();
-			LogFile.ActivateOptions();
-
-			BasicConfigurator.Configure(new IAppender[] { EventLog, LogFile });
-		}
-	}
-	#endregion Log Configurator
-
 	public class Log
 	{
 		private ILog Logger;
 
+        #region Initialiser
 		public Log(string LogName)
 		{
 			Logger = LogManager.GetLogger(LogName);
 		}
+        #endregion Initialiser
 
-		#region Log Methods
+		#region Public Methods
 		public void Debug(string formatString, params object[] paramList)
 		{
 			Logger.Debug(string.Format(formatString, paramList));
@@ -120,6 +69,59 @@ namespace PingerTool.Classes
 		{
 			Logger.Fatal(string.Format(formatString, paramList), Ex);
 		}
-		#endregion Log Methods
+		#endregion Public Methods
+	}
+
+	class LogInitiator
+	{
+        #region Log Configurator
+		public static void ConfigureLog(string LogFileName, string LogLevel)
+		{
+			// Generic Configuration
+			Hierarchy hierarchy = (Hierarchy)LogManager.GetRepository();
+			hierarchy.Root.RemoveAllAppenders();
+
+			var PatternLayout = new PatternLayout()
+			{
+				ConversionPattern = "%date{dd MMM yyyy HH:mm:ss} [%-10c] %-5p:	%m%n"
+			};
+
+			// Get Logging Level
+			var LoggingLevel = hierarchy.LevelMap[LogLevel];
+			if( LoggingLevel == null )
+			{
+				LoggingLevel = Level.All;
+			}
+
+			// Configure Event Log
+			var EventLog = new EventLogAppender()
+			{
+				ApplicationName = "PingerTool",
+				Layout			= PatternLayout,
+				Threshold		= Level.Warn
+			};
+
+			// Configure File Log
+			var LogFile = new FileAppender()
+			{
+				File			= LogFileName,
+				LockingModel	= new FileAppender.MinimalLock(),
+				Layout			= PatternLayout,
+				#if DEBUG
+				Threshold		= Level.Debug,
+				#else
+				Threshold		= LoggingLevel,
+				#endif
+				AppendToFile	= true
+			};
+
+			// Activate Logging
+			PatternLayout.ActivateOptions();
+			EventLog.ActivateOptions();
+			LogFile.ActivateOptions();
+
+			BasicConfigurator.Configure(new IAppender[] { EventLog, LogFile });
+		}
+        #endregion Log Configurator
 	}
 }

@@ -10,11 +10,13 @@ namespace PingerTool.Controls
     {
         private PingControlModel _Model;
 
+        #region Initialiser
         public PingControl()
         {
             InitializeComponent();
             _Model = (PingControlModel)DataContext;
         }
+        #endregion Initialiser
     }
 
     public class PingControlModel : ViewModel

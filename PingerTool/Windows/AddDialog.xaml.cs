@@ -10,6 +10,7 @@ namespace PingerTool.Windows
         private AddDialogModel _Model;
 		private MainWindow _Window;
 
+        #region Initialiser
 		public AddDialog(MainWindow Window)
 		{
             InitializeComponent();
@@ -17,6 +18,7 @@ namespace PingerTool.Windows
             _Model = (AddDialogModel)DataContext;
 			_Window = Window;
 		}
+        #endregion Initialiser
 
 		#region Window Events
         /// <summary>

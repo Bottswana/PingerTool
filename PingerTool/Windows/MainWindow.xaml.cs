@@ -9,6 +9,7 @@ using PingerTool.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
 using System.Globalization;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace PingerTool.Windows
@@ -21,7 +22,7 @@ namespace PingerTool.Windows
         public ProjectControl Proj;
         public Log Log;
 
-		#region Window Construction
+		#region Initialiser
 		public MainWindow()
 		{
 			InitializeComponent();
@@ -45,7 +46,7 @@ namespace PingerTool.Windows
 			Model.VersionString = string.Format("{0} - Production Build", Helpers.GetApplicationVersion());
 			#endif
         }
-		#endregion Window Construction
+		#endregion Initialiser
 
         #region Window Events
 		/// <summary>
@@ -247,17 +248,35 @@ namespace PingerTool.Windows
 
             return true;
         }
+
+        /// <summary>
+        /// Delete all Ping Elements
+        /// </summary>
+        public void ClearAllElements()
+        {
+            _Model.PingWindows.Clear();
+            _Model.Columns = 1;
+        }
+
+        /// <summary>
+        /// Get a list of active Ping Elements
+        /// </summary>
+        /// <returns>List of Ping Elements</returns>
+        public List<PingControlModel> GetAllElements()
+        {
+            return _Model.PingWindows.ToList();
+        }
         #endregion Public Methods
     }
 
     public class MainWindowModel : ViewModel
     {
-        #region Initializer
+        #region Initialiser
         public MainWindowModel()
         {
             PingWindows = new ObservableCollection<PingControlModel>();
         }
-        #endregion Initializer
+        #endregion Initialiser
 
 		#region Private Properties
 		private string _VersionString;

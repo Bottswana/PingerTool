@@ -1,13 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Net;
-using System.Linq;
-using System.Windows;
 using Microsoft.Win32;
 using Newtonsoft.Json;
-using FontAwesome.WPF;
 using PingerTool.Windows;
-using System.Windows.Media;
 using System.Collections.Generic;
 
 namespace PingerTool.Classes
@@ -52,11 +48,11 @@ namespace PingerTool.Classes
 		#region Project Control
 		public bool NewProject()
 		{
-			// Reset data in MainWindow
+			// Clear the data from the MainWindow Model
 			_Window.Title = "PingerTool - Untitled Project*";
-            sCurrentFile = null;
-			//_Window.ContentCtrl.Content = "";
+            _Window.ClearAllElements();
 
+            sCurrentFile = null;
 			SaveNeeded = true;
 			return true;
 		}
@@ -68,12 +64,15 @@ namespace PingerTool.Classes
 				// Get FileData
 				var FileObject = JsonConvert.DeserializeObject<SaveFileData>(File.ReadAllText(FilePath));
 
-                // TODO: Restore Data
+                // Restore Data
+                foreach( var PingElement in FileObject.PingElements )
+                {
+                    if( PingElement.Address == null || PingElement.Name == null ) continue;
+                    _Window.CreatePingElement(PingElement.Name, PingElement.Address);
+                }
 
 				// Restore Environment
 				_Window.Title = "PingerTool - " + Path.GetFileName(FilePath);
-				_AddToHistory(FilePath);
-
 				sCurrentFile = FilePath;
 				SaveNeeded = false;
 				return true;
@@ -89,12 +88,21 @@ namespace PingerTool.Classes
 		{
 			try
 			{
-                // TODO: Set data to save
+                // Get list of Ping Controls
+                var PingWindow = new List<SaveFileData.PingElement>();
+                foreach( var Element in _Window.GetAllElements() )
+                {
+                    PingWindow.Add(new SaveFileData.PingElement()
+                    {
+                        Address = Element.Address,
+                        Name = Element.DisplayName
+                    });
+                }
 
 				// Convert into file data
 				var FileData = JsonConvert.SerializeObject(new SaveFileData()
 				{
-
+                    PingElements = PingWindow
 				});
 
 				// Write to file
@@ -102,8 +110,6 @@ namespace PingerTool.Classes
 
 				// Update Environment
 				_Window.Title = "PingerTool - " + Path.GetFileName(FilePath);
-				_AddToHistory(FilePath);
-
 				sCurrentFile = FilePath;
 				SaveNeeded = false;
 				return true;
@@ -145,88 +151,22 @@ namespace PingerTool.Classes
 				return null;
 			}
 		}
-
-		/// <summary>
-		/// Get array of recently opened files
-		/// </summary>
-		/// <returns>Array of file paths</returns>
-		public List<string> GetRecentProjects()
-		{
-			try
-			{
-				var RootKey = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Default);
-				var TSKey = RootKey.OpenSubKey(@"Software\PingerTool", true);
-				if( TSKey != null )
-				{
-					// Key Exists
-					var RecentFiles = ((string)TSKey.GetValue("RecentFiles", "")).Split(';');
-					return ( RecentFiles.Length > 0 ) ? new List<string>(RecentFiles) : new List<string>();
-				}
-				else
-				{
-					// Create new key
-					TSKey = RootKey.CreateSubKey(@"Software\PingerTool");
-					return new List<string>();
-				}
-			}
-			catch( Exception Ex )
-			{
-				_AppRef.Log.Error(Ex, "Unable to access registry keys");
-				return null;
-			}
-		}
-
-		/// <summary>
-		/// Add file to file history
-		/// </summary>
-		/// <param name="FileName">File Path</param>
-		private void _AddToHistory(string FileName)
-		{
-			try
-			{
-				var RootKey = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Default);
-				var TSKey = RootKey.OpenSubKey(@"Software\PingerTool", true);
-				if( TSKey != null )
-				{
-					// Update inside existing key
-					var RecentFiles = ((string)TSKey.GetValue("RecentFiles", "")).Split(';');
-					var NewArray = new List<string>();
-
-					// Check we dont exist
-					var ExistCount = RecentFiles.Where( q => { return q.Equals(FileName); } ).Count();
-					if( ExistCount == 0 )
-					{
-						NewArray.Add(FileName);
-						for( int i=0; i < 9; i++ )
-						{
-							if( i >= RecentFiles.Length || RecentFiles[i].Length == 0 ) continue;
-							NewArray.Add(RecentFiles[i]);
-						}
-
-						// Save back to registry
-						TSKey.SetValue("RecentFiles", String.Join(";", NewArray));
-						TSKey.SetValue("LastFile", FileName);
-					}
-				}
-				else
-				{
-					// Create new key
-					TSKey = RootKey.CreateSubKey(@"Software\PingerTool");
-					TSKey.SetValue("RecentFiles", FileName);
-				}
-			}
-			catch( Exception Ex )
-			{
-				_AppRef.Log.Error(Ex, "Unable to access registry keys");
-			}
-		}
 		#endregion Project Info
 	}
 
-    #region Save File Structure
 	public class SaveFileData
 	{
+        #region Save File Structure
+        public class PingElement
+        {
+            public IPAddress Address { get; set; }
+            public string Name { get; set; }
+        }
 
+        /// <summary>
+        /// List of current Ping Elements
+        /// </summary>
+        public List<PingElement> PingElements { get; set; }
+        #endregion Save File Structure
 	}
-    #endregion Save File Structure
 }

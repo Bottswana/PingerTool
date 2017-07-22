@@ -10,6 +10,7 @@ namespace PingerTool.Windows
         private SettingsModel _Model;
 		private MainWindow _Window;
 
+        #region Initialiser
 		public Settings(MainWindow Window)
 		{
             InitializeComponent();
@@ -17,6 +18,7 @@ namespace PingerTool.Windows
             _Model = (SettingsModel)DataContext;
 			_Window = Window;
 		}
+        #endregion Initialiser
 
 		#region Window Events
         /// <summary>
@@ -24,22 +26,7 @@ namespace PingerTool.Windows
         /// </summary>
 		private void _Save_Click(object sender, RoutedEventArgs e)
 		{
-            /*
-			if( _Model.DisplayName.Length > 0 && _Model.IPAddress.Length > 0 )
-			{
-                // We need to convert the text IP to the IPAddress class.
-                if( IPAddress.TryParse(_Model.IPAddress, out IPAddress ParsedAddress) )
-                {
-                    // Add Ping Check
-                    if( _Window.CreatePingElement(_Model.DisplayName, ParsedAddress) ) Close();
-                    else MessageBox.Show("This IP Address already has a check associated to it", "Whoops", MessageBoxButton.OK, MessageBoxImage.Information);
-                }
-                else
-                {
-                    // Invalid IP
-                    MessageBox.Show("The IP Address you entered is invalid", "Whoops", MessageBoxButton.OK, MessageBoxImage.Information);
-                }
-			}*/
+            // Not implemented yet
 		}
 
 		/// <summary>
