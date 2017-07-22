@@ -14,13 +14,13 @@
     <Window.DataContext>
         <local:AddDialogModel/>
     </Window.DataContext>
-    
-    <Grid>
-        <Label Content="IP Address:" HorizontalAlignment="Left" Margin="10,20,0,0" VerticalAlignment="Top"/>
-        <TextBox Text="{Binding IPAddress}" HorizontalAlignment="Left" Height="23" Margin="144,23,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="236" Padding="5,2,0,0"/>
 
-        <Label Content="Display Name:" HorizontalAlignment="Left" Margin="10,56,0,0" VerticalAlignment="Top"/>
-        <TextBox Text="{Binding DisplayName}" HorizontalAlignment="Left" Height="23" Margin="144,59,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="236" Padding="5,2,0,0"/>
+    <Grid FocusManager.FocusedElement="{Binding ElementName=TextBox}">
+        <Label Content="Display Name:" HorizontalAlignment="Left" Margin="10,20,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="TextBox" Text="{Binding DisplayName, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Height="23" Margin="144,23,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="236" Padding="5,2,0,0"/>
+
+        <Label Content="IP Address:" HorizontalAlignment="Left" Margin="10,56,0,0" VerticalAlignment="Top"/>
+        <TextBox Text="{Binding IPAddress, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Height="23" Margin="144,59,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="236" Padding="5,2,0,0"/>
 
         <Button Content="Save" HorizontalAlignment="Left" Margin="225,99,0,0" VerticalAlignment="Top" Width="75" Click="_Save_Click" IsDefault="True"/>
         <Button Content="Discard" HorizontalAlignment="Left" Margin="305,99,0,0" VerticalAlignment="Top" Width="75" Click="_Discard_Click" IsCancel="True"/>

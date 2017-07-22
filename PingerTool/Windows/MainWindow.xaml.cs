@@ -202,6 +202,8 @@ namespace PingerTool.Windows
             if( TotalCount > 8 ) _Model.Columns = 3; // Three windows wide, we can fit about 12 on a 1080 screen before it gets silly
             else if( TotalCount > 1 ) _Model.Columns = 2;
             else _Model.Columns = 1;
+
+            Proj.TriggerSaveStatus();
             return true;
         }
 
@@ -227,6 +229,8 @@ namespace PingerTool.Windows
             if( TotalCount > 8 ) _Model.Columns = 3; // Three windows wide, we can fit about 12 on a 1080 screen before it gets silly
             else if( TotalCount > 1 ) _Model.Columns = 2;
             else _Model.Columns = 1;
+
+            Proj.TriggerSaveStatus();
             return true;
         }
 
@@ -246,6 +250,7 @@ namespace PingerTool.Windows
             var Element = _Model.PingWindows.First(q => { return q.Address.Equals(Address); });
             Element.DisplayName = NewName;
 
+            Proj.TriggerSaveStatus();
             return true;
         }
 

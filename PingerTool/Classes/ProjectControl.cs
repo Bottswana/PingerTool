@@ -67,8 +67,21 @@ namespace PingerTool.Classes
                 // Restore Data
                 foreach( var PingElement in FileObject.PingElements )
                 {
-                    if( PingElement.Address == null || PingElement.Name == null ) continue;
-                    _Window.CreatePingElement(PingElement.Name, PingElement.Address);
+                    if( PingElement.Address == null || PingElement.Name == null )
+                    {
+                        _AppRef.Log.Warn("Unable to import PingElement due to invalid name or address: {0}, {1}", PingElement.Address, PingElement.Name);
+                    }
+                    else
+                    {
+                        if( IPAddress.TryParse(PingElement.Address, out IPAddress Address) )
+                        {
+                            _Window.CreatePingElement(PingElement.Name, Address);
+                        }
+                        else
+                        {
+                            _AppRef.Log.Warn("Unable to import PingElement due to invalid address: {0}", PingElement.Address);
+                        }
+                    }
                 }
 
 				// Restore Environment
@@ -94,7 +107,7 @@ namespace PingerTool.Classes
                 {
                     PingWindow.Add(new SaveFileData.PingElement()
                     {
-                        Address = Element.Address,
+                        Address = Element.Address.ToString(),
                         Name = Element.DisplayName
                     });
                 }
@@ -159,7 +172,7 @@ namespace PingerTool.Classes
         #region Save File Structure
         public class PingElement
         {
-            public IPAddress Address { get; set; }
+            public string Address { get; set; }
             public string Name { get; set; }
         }
 
