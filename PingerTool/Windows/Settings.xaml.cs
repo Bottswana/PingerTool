@@ -42,11 +42,150 @@ namespace PingerTool.Windows
     class SettingsModel : ViewModel
     {
         #region Private Properties
+        private bool _EnableWebserver = false;
+        private bool _EnableAuth = false;
+        private int _WarningThreshold;
+        private int _PingTimeout;
 
+        private string _BindAddress = "0.0.0.0:8080";
+        private string _AllowedSubnet = "0.0.0.0/0";
+        private string _Username = "";
         #endregion Private Properties
 
         #region Public Properties
+        /// <summary>
+        /// Ping Timeout Value
+        /// </summary>
+        public int PingTimeout
+        {
+            get
+            {
+                return _PingTimeout;
+            }
+            set
+            {
+                if( _PingTimeout != value )
+                {
+                    _PingTimeout = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
 
+        /// <summary>
+        /// Ping Round-Trip Warning Threshold
+        /// </summary>
+        public int WarningThreshold
+        {
+            get
+            {
+                return _WarningThreshold;
+            }
+            set
+            {
+                if( _WarningThreshold != value )
+                {
+                    _WarningThreshold = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Enable Server Authentication
+        /// </summary>
+        public bool EnableAuth
+        {
+            get
+            {
+                return _EnableAuth;
+            }
+            set
+            {
+                if( _EnableAuth != value )
+                {
+                    _EnableAuth = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Enable Webserver
+        /// </summary>
+        public bool EnableWebserver
+        {
+            get
+            {
+                return _EnableWebserver;
+            }
+            set
+            {
+                if( _EnableWebserver != value )
+                {
+                    if( value == false ) EnableAuth = false;
+                    _EnableWebserver = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Webserver Bind Address
+        /// </summary>
+        public string BindAddress
+        {
+            get
+            {
+                return _BindAddress;
+            }
+            set
+            {
+                if( _BindAddress != value )
+                {
+                    _BindAddress = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Allowed subnet for Webserver
+        /// </summary>
+        public string AllowedSubnet
+        {
+            get
+            {
+                return _AllowedSubnet;
+            }
+            set
+            {
+                if( _AllowedSubnet != value )
+                {
+                    _AllowedSubnet = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Username for Authentication
+        /// </summary>
+        public string Username
+        {
+            get
+            {
+                return _Username;
+            }
+            set
+            {
+                if( _Username != value )
+                {
+                    _Username = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
         #endregion Public Properties
     }
 }

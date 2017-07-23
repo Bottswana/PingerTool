@@ -21,6 +21,7 @@ namespace PingerTool.Controls
 
         private PingControlModel _Model;
         private Timer _Timer;
+        private App _AppRef;
         private Ping _Ping;
 
         #region Initialiser
@@ -30,6 +31,7 @@ namespace PingerTool.Controls
             _Timer = new Timer(1000);
             _Timer.Elapsed += _Timer_Elapsed;
 
+            _AppRef = App.GetApp();
             _Ping = new Ping();
         }
 
@@ -71,7 +73,7 @@ namespace PingerTool.Controls
             try
             {
                 _Running = true;
-                var PingInfo = _Ping.Send(_Model.Address, 2000);
+                var PingInfo = _Ping.Send(_Model.Address, _AppRef.TimeoutValue);
                 if( !_Running ) return; // This accounts for timers which were Disabled while the Ping request was pending
                 switch( PingInfo.Status )
                 {
@@ -81,7 +83,7 @@ namespace PingerTool.Controls
                         else _Model.DisplayContents += $"Reply from {PingInfo.Address}: bytes={PingInfo.Buffer.Length} time{Time} TTL={PingInfo.Options.Ttl} count={_Count}\n";
                         _Model.LastContact = DateTime.Now.ToString();
 
-                        if( PingInfo.RoundtripTime > App.GetApp().WarningTimeframe ) _Model.Colour = Brushes.Orange;
+                        if( PingInfo.RoundtripTime > _AppRef.WarningTimeframe ) _Model.Colour = Brushes.Orange;
                         else _Model.Colour = Brushes.Green;
                         _Count++;
                         break;
@@ -118,7 +120,7 @@ namespace PingerTool.Controls
             catch( Exception Ex )
             {
                 _Model.DisplayContents += $"PING: transmit failed. General failure.\n";
-                App.GetApp()?.Log.Debug(Ex, "Ping Transmit Failed");
+                _AppRef.Log.Debug(Ex, "Ping Transmit Failed");
                 _Model.Colour = Brushes.Maroon;
                 _Running = false;
                 _Count = 1;
@@ -154,7 +156,7 @@ namespace PingerTool.Controls
         /// </summary>
 		private void _UserControl_Unloaded(object sender, RoutedEventArgs e)
 		{
-			App.GetApp().Log.Debug("PingControl is being disposed");
+			_AppRef.Log.Debug("PingControl is being disposed");
 			Dispose();
 		}
 
@@ -180,7 +182,7 @@ namespace PingerTool.Controls
         /// </summary>
 		private void _Edit_Click(object sender, RoutedEventArgs e)
 		{
-            var ResolveWindow = (MainWindow)App.GetApp()?.MainWindow;
+            var ResolveWindow = (MainWindow)_AppRef?.MainWindow;
             if( ResolveWindow != null )
             {
                 var AddDialog = new AddDialog(ResolveWindow, _Model.Address, _Model.DisplayName);
@@ -196,7 +198,7 @@ namespace PingerTool.Controls
 		{
             if( MessageBox.Show($"Are you sure you wish to delete this check?\n{_Model.DisplayName}", "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes )
             {
-                var ResolveWindow = (MainWindow)App.GetApp()?.MainWindow;
+                var ResolveWindow = (MainWindow)_AppRef?.MainWindow;
                 if( ResolveWindow != null )
                 {
                     ResolveWindow.RemovePingElement(_Model.Address);

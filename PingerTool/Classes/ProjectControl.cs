@@ -65,6 +65,7 @@ namespace PingerTool.Classes
 				var FileObject = JsonConvert.DeserializeObject<SaveFileData>(File.ReadAllText(FilePath));
 
                 // Restore Data
+                _AppRef.TimeoutValue = FileObject.PingTimeout;
                 _AppRef.WarningTimeframe = FileObject.WarningThreshold;
                 foreach( var PingElement in FileObject.PingElements )
                 {
@@ -117,6 +118,7 @@ namespace PingerTool.Classes
 				var FileData = JsonConvert.SerializeObject(new SaveFileData()
 				{
                     WarningThreshold = _AppRef.WarningTimeframe,
+                    PingTimeout = _AppRef.TimeoutValue,
                     PingElements = PingWindow
 				});
 
@@ -187,6 +189,11 @@ namespace PingerTool.Classes
         /// Threshold for warning when roundtrip is > than this 
         /// </summary>
         public int WarningThreshold { get; set; }
+
+        /// <summary>
+        /// Ping timeout value
+        /// </summary>
+        public int PingTimeout { get; set; }
         #endregion Save File Structure
 	}
 }

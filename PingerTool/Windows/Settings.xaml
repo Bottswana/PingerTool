@@ -9,16 +9,40 @@
         WindowStartupLocation="CenterOwner"
         ResizeMode="CanMinimize"
         Title="Settings"
-        Height="400" 
+        Height="480" 
         Width="410">
-    <Window.DataContext>
+    <d:Window.DataContext>
+        <!-- Using d prefix so model is bound in designer only. Actual DataContext is bound in constructor in Settings.xaml.cs -->
         <local:SettingsModel/>
-    </Window.DataContext>
-    
-    <Grid>
+    </d:Window.DataContext>
 
+    <Grid FocusManager.FocusedElement="{Binding ElementName=TextBox}">
+        <Label Content="General Settings" HorizontalAlignment="Left" Margin="10,15,0,0" VerticalAlignment="Top" FontSize="18" />
+        
+        <Label Content="Ping Timeout Value (ms):" HorizontalAlignment="Left" Margin="15,60,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="TextBox" Text="{Binding PingTimeout, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Right" Height="23" Margin="0,63,15,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="140" Padding="5,2,0,0"/>
 
-        <Button Content="Save" HorizontalAlignment="Left" Margin="225,99,0,0" VerticalAlignment="Top" Width="75" Click="_Save_Click" IsDefault="True"/>
-        <Button Content="Discard" HorizontalAlignment="Left" Margin="305,99,0,0" VerticalAlignment="Top" Width="75" Click="_Discard_Click" IsCancel="True"/>
+        <Label Content="Time Warning Threshold (ms):" HorizontalAlignment="Left" Margin="15,90,0,0" VerticalAlignment="Top"/>
+        <TextBox Text="{Binding WarningThreshold, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Right" Height="23" Margin="0,93,15,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="140" Padding="5,2,0,0"/>
+
+        <Label Content="Webserver Settings" HorizontalAlignment="Left" Margin="10,135,0,0" VerticalAlignment="Top" FontSize="18" />
+
+        <CheckBox Content="Enable Webserver" IsChecked="{Binding EnableWebserver, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="16,190,0,0" />
+        <CheckBox IsEnabled="{Binding EnableWebserver}" Content="Enable Authentication" IsChecked="{Binding EnableAuth, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="16,215,0,0" />
+
+        <Label Content="Server Bind Address:" HorizontalAlignment="Left" Margin="15,256,0,0" VerticalAlignment="Top"/>
+        <TextBox IsEnabled="{Binding EnableWebserver}" Text="{Binding BindAddress, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Right" Height="23" Margin="0,257,15,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="140" Padding="5,2,0,0"/>
+
+        <Label Content="Allowed Subnets (Comma Seperated):" HorizontalAlignment="Left" Margin="15,287,0,0" VerticalAlignment="Top"/>
+        <TextBox IsEnabled="{Binding EnableWebserver}" Text="{Binding AllowedSubnet, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Right" Height="23" Margin="0,288,15,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="140" Padding="5,2,0,0"/>
+
+        <Label Content="Username:" HorizontalAlignment="Left" Margin="15,318,0,0" VerticalAlignment="Top"/>
+        <TextBox IsEnabled="{Binding EnableAuth}" Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Right" Height="23" Margin="0,320,15,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="140" Padding="5,2,0,0"/>
+
+        <Label Content="Password:" HorizontalAlignment="Left" Margin="15,350,0,0" VerticalAlignment="Top"/>
+        <PasswordBox IsEnabled="{Binding EnableAuth}" HorizontalAlignment="Right" Height="23" Margin="0,352,15,0" VerticalAlignment="Top" Width="140" Padding="5,2,0,0"/>
+
+        <Button Content="Save" HorizontalAlignment="Left" Margin="225,405,0,0" VerticalAlignment="Top" Width="75" Click="_Save_Click" IsDefault="True"/>
+        <Button Content="Discard" HorizontalAlignment="Left" Margin="305,405,0,0" VerticalAlignment="Top" Width="75" Click="_Discard_Click" IsCancel="True"/>
     </Grid>
 </Window>
