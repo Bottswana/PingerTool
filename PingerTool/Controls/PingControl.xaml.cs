@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Net;
+using System.Linq;
 using System.Timers;
 using System.Windows;
+using System.Net.Sockets;
 using PingerTool.Classes;
 using System.Windows.Media;
 using System.Windows.Controls;
@@ -11,9 +13,12 @@ namespace PingerTool.Controls
 {
     public partial class PingControl : UserControl, IDisposable
     {
+        private static int _MaxContainerLines = 50;
         private bool _DisposedValue = false;
-        private PingControlModel _Model;
         private bool _Running = false;
+        private long _Count = 1;
+
+        private PingControlModel _Model;
         private Timer _Timer;
         private Ping _Ping;
 
@@ -61,9 +66,6 @@ namespace PingerTool.Controls
         /// </summary>
         private void _Timer_Elapsed( object sender, ElapsedEventArgs e )
         {
-            // TODO: trim container over x lines
-            // TODO: Last Contact
-
             if( _Running ) return; // Only run timer callback one at a time
             try
             {
@@ -72,32 +74,42 @@ namespace PingerTool.Controls
                 switch( PingInfo.Status )
                 {
                     case IPStatus.Success:
-                         var Time = (PingInfo.RoundtripTime < 1) ? "<1ms" : $"={PingInfo.RoundtripTime}ms";
-                        _Model.DisplayContents += $"Reply from {PingInfo.Address}: bytes={PingInfo.Buffer.Length} time{Time} TTL={PingInfo.Options.Ttl}\n";
-                        _Model.Colour = Brushes.Green;
+                        var Time = (PingInfo.RoundtripTime < 1) ? "<1ms" : $"={PingInfo.RoundtripTime}ms";
+                        if( _Model.Address.AddressFamily == AddressFamily.InterNetworkV6 ) _Model.DisplayContents += $"Reply from {PingInfo.Address}: time{Time} count={_Count}\n";
+                        else _Model.DisplayContents += $"Reply from {PingInfo.Address}: bytes={PingInfo.Buffer.Length} time{Time} TTL={PingInfo.Options.Ttl} count={_Count}\n";
+                        _Model.LastContact = DateTime.Now.ToString();
+
+                        if( PingInfo.RoundtripTime > App.GetApp().WarningTimeframe ) _Model.Colour = Brushes.Orange;
+                        else _Model.Colour = Brushes.Green;
+                        _Count++;
                         break;
                     
                     case IPStatus.DestinationHostUnreachable:
                         _Model.DisplayContents += $"Reply from {PingInfo.Address}: Destination host unreachable.\n";
                         _Model.Colour = Brushes.Maroon;
+                        _Count = 1;
                         break;
 
                      case IPStatus.DestinationNetworkUnreachable:
                         _Model.DisplayContents += $"Reply from {PingInfo.Address}: Destination net unreachable.\n";
                         _Model.Colour = Brushes.Maroon;
+                        _Count = 1;
                         break;
                        
                     case IPStatus.TimedOut:
                         _Model.DisplayContents += $"Request Timed Out.\n";
                         _Model.Colour = Brushes.Maroon;
+                        _Count = 1;
                         break;
 
                     default:
                         _Model.DisplayContents += $"Unknown message type: {PingInfo.Status.ToString()}\n";
                         _Model.Colour = Brushes.Maroon;
+                        _Count = 1;
                         break;
                 }
 
+                _TrimContainer();
                 _Running = false;
                 return;
             }
@@ -107,6 +119,31 @@ namespace PingerTool.Controls
                 App.GetApp().Log.Debug(Ex, "Ping Transmit Failed");
                 _Model.Colour = Brushes.Maroon;
                 _Running = false;
+                _Count = 1;
+            }
+        }
+
+        /// <summary>
+        /// Trim the text container to keep it under our max lines.
+        /// </summary>
+        private void _TrimContainer()
+        {
+            var TotalNewlines = 0;
+            if( _Model.DisplayContents != null )
+            {
+                for( var i=0; i < _Model.DisplayContents.Length; i++ ) if( _Model.DisplayContents[i] == '\n' ) TotalNewlines++;
+                if( TotalNewlines > _MaxContainerLines )
+                {
+                    for( var i=0; i < _Model.DisplayContents.Length; i++ )
+                    {
+                        if( _Model.DisplayContents[i] != '\n' ) continue; // If not a newline, continue looping over characters
+                        if( TotalNewlines > _MaxContainerLines+1 ) { TotalNewlines--; continue; } // Continue until we make TotalNewlines = 5
+
+                        // Strip all characters from 0 to our last newline location, which truncates the string to our max line count
+                        _Model.DisplayContents = _Model.DisplayContents.Substring(i+1);
+                        break;
+                    }
+                }
             }
         }
 
@@ -119,6 +156,37 @@ namespace PingerTool.Controls
 			Dispose();
 		}
         #endregion Window Events
+
+        #region Public Methods
+        /// <summary>
+        /// Pause the ping timer on this control
+        /// </summary>
+        /// <returns>True if successful, False if already paused</returns>
+        public bool PauseControl()
+        {
+            if( !_Timer.Enabled ) return false;
+            _Model.DisplayContents = "Ping Control Paused\n";
+            _Model.Colour = Brushes.Orange;
+
+            _Timer.Enabled = false;
+            _Running = false;
+            return true;
+        }
+
+        /// <summary>
+        /// Resume this paused ping control
+        /// </summary>
+        /// <returns>True if successful, False if not paused</returns>
+        public bool ResumeControl()
+        {
+            if( _Timer.Enabled ) return false;
+            _Model.DisplayContents = "";
+            _Count = 1;
+            
+            _Timer.Enabled = true;
+            return true;
+        }
+        #endregion Public Methods
     }
 
     public class PingControlModel : ViewModel

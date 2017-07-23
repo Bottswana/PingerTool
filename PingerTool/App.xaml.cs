@@ -11,6 +11,7 @@ namespace PingerTool
 {
 	public partial class App
 	{
+        public int WarningTimeframe = 2000;
 		public Log Log;
 
 		#region Initialisation

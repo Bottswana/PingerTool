@@ -35,8 +35,10 @@ namespace PingerTool.Windows
 
 			// Use Fontawesome icons for ribbon
 			var ColourBrush = (SolidColorBrush)(new BrushConverter().ConvertFrom("#2b579a"));
+            Add.LargeIcon		= ImageAwesome.CreateImageSource(FontAwesomeIcon.PlusSquare, ColourBrush);
+            PauseAll.LargeIcon  = ImageAwesome.CreateImageSource(FontAwesomeIcon.Pause, ColourBrush);
+            ResumeAll.LargeIcon = ImageAwesome.CreateImageSource(FontAwesomeIcon.Play, ColourBrush);
             Settings.LargeIcon	= ImageAwesome.CreateImageSource(FontAwesomeIcon.Cogs, ColourBrush);
-			Add.LargeIcon		= ImageAwesome.CreateImageSource(FontAwesomeIcon.PlusSquare, ColourBrush);
 
 			// Version Info
 			_Model.CompiledOn = Helpers.GetLinkerTime().ToString();
@@ -175,7 +177,51 @@ namespace PingerTool.Windows
                 Settings.Owner = this;
                 Settings.ShowDialog();
         }
+
+        /// <summary>
+        /// Event hander for clicking the pause all button
+        /// </summary>
+        private void _PauseAll_Click( object sender, RoutedEventArgs e )
+        {
+            foreach( var PingControl in FindVisualChildren<PingControl>(this) )
+            {
+                PingControl.PauseControl();
+            }
+        }
+
+        /// <summary>
+        /// Event hander for clicking the resume all button
+        /// </summary>
+        private void _ResumeAll_Click( object sender, RoutedEventArgs e )
+        {
+            foreach( var PingControl in FindVisualChildren<PingControl>(this) )
+            {
+                PingControl.ResumeControl();
+            }
+        }
         #endregion Window Events
+
+        #region Private Methods
+        public static IEnumerable<T> FindVisualChildren<T>(DependencyObject depObj) where T : DependencyObject
+        {
+            if( depObj != null )
+            {
+                for( int i = 0; i < VisualTreeHelper.GetChildrenCount(depObj); i++ )
+                {
+                    DependencyObject child = VisualTreeHelper.GetChild(depObj, i);
+                    if( child != null && child is T )
+                    {
+                        yield return (T)child;
+                    }
+
+                    foreach( T childOfChild in FindVisualChildren<T>(child) )
+                    {
+                        yield return childOfChild;
+                    }
+                }
+            }
+        }
+        #endregion PrivateMethods
 
         #region Public Methods
         /// <summary>

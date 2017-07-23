@@ -119,12 +119,17 @@
                     <Fluent:Button x:Name="Add" Header="Create" Click="_AddCheck_Click" />
                 </Fluent:RibbonGroupBox>
 
+                <Fluent:RibbonGroupBox Header="Controls">
+                    <Fluent:Button x:Name="ResumeAll" Header="Resume All" Click="_ResumeAll_Click"/>
+                    <Fluent:Button x:Name="PauseAll" Header="Pause All" Click="_PauseAll_Click" />
+                </Fluent:RibbonGroupBox>
+
             </Fluent:RibbonTabItem>
         </Fluent:Ribbon>
 
         <!-- Window Content -->
         <Grid Grid.Row="1" Grid.Column="0" Background="WhiteSmoke" Margin="0,0,0.333,-0.333" Grid.RowSpan="2">
-            <ItemsControl ItemsSource="{Binding PingWindows}">
+            <ItemsControl ItemsSource="{Binding PingWindows}" x:Name="ItemControl">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <UniformGrid Columns="{Binding Columns}" />
@@ -133,7 +138,7 @@
 
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <controls:PingControl DataContext="{Binding}" Background="WhiteSmoke" BorderThickness="1" BorderBrush="Gray" Margin="1" />
+                        <controls:PingControl DataContext="{Binding}" Background="WhiteSmoke" BorderThickness="1" BorderBrush="LightGray" Margin="1" />
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
