@@ -8,7 +8,7 @@
         
         WindowStartupLocation="CenterOwner"
         ResizeMode="CanMinimize"
-        Title="Add Ping Check"
+        Title="Ping Check"
         Height="175" 
         Width="410">
     <Window.DataContext>

@@ -2,8 +2,10 @@
 using System.Net;
 using System.Timers;
 using System.Windows;
+using FontAwesome.WPF;
 using System.Net.Sockets;
 using PingerTool.Classes;
+using PingerTool.Windows;
 using System.Windows.Media;
 using System.Windows.Controls;
 using System.Net.NetworkInformation;
@@ -116,7 +118,7 @@ namespace PingerTool.Controls
             catch( Exception Ex )
             {
                 _Model.DisplayContents += $"PING: transmit failed. General failure.\n";
-                App.GetApp().Log.Debug(Ex, "Ping Transmit Failed");
+                App.GetApp()?.Log.Debug(Ex, "Ping Transmit Failed");
                 _Model.Colour = Brushes.Maroon;
                 _Running = false;
                 _Count = 1;
@@ -150,10 +152,56 @@ namespace PingerTool.Controls
         /// <summary>
         /// Event for Unloading Control
         /// </summary>
-		private void UserControl_Unloaded(object sender, RoutedEventArgs e)
+		private void _UserControl_Unloaded(object sender, RoutedEventArgs e)
 		{
 			App.GetApp().Log.Debug("PingControl is being disposed");
 			Dispose();
+		}
+
+        /// <summary>
+        /// Event for Pause Button
+        /// </summary>
+		private void _Pause_Click(object sender, RoutedEventArgs e)
+		{
+            if( _Timer.Enabled )
+            {
+                _Model.PauseIcon = FontAwesomeIcon.Play;
+                PauseControl();
+            }
+            else
+            {
+                _Model.PauseIcon = FontAwesomeIcon.Pause;
+                ResumeControl();
+            }
+		}
+
+        /// <summary>
+        /// Event for Edit Button
+        /// </summary>
+		private void _Edit_Click(object sender, RoutedEventArgs e)
+		{
+            var ResolveWindow = (MainWindow)App.GetApp()?.MainWindow;
+            if( ResolveWindow != null )
+            {
+                var AddDialog = new AddDialog(ResolveWindow, _Model.Address, _Model.DisplayName);
+                    AddDialog.Owner = ResolveWindow;
+                    AddDialog.ShowDialog();
+            }
+		}
+
+        /// <summary>
+        /// Event for Delete Button
+        /// </summary>
+		private void _Delete_Click(object sender, RoutedEventArgs e)
+		{
+            if( MessageBox.Show($"Are you sure you wish to delete this check?\n{_Model.DisplayName}", "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes )
+            {
+                var ResolveWindow = (MainWindow)App.GetApp()?.MainWindow;
+                if( ResolveWindow != null )
+                {
+                    ResolveWindow.RemovePingElement(_Model.Address);
+                }
+            }
 		}
         #endregion Window Events
 
@@ -192,6 +240,7 @@ namespace PingerTool.Controls
     public class PingControlModel : ViewModel
     {
         #region Private Properties
+        private FontAwesomeIcon _PauseIcon = FontAwesomeIcon.Pause;
         private string _LastContact = "Never";
         private Brush _Colour = Brushes.Gray;
 
@@ -280,6 +329,23 @@ namespace PingerTool.Controls
                 }
             }
         }
+
+        public FontAwesomeIcon PauseIcon
+        {
+            get
+            {
+                return _PauseIcon;
+            }
+            set
+            {
+                if( _PauseIcon != value )
+                {
+                    _PauseIcon = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
         #endregion Public Properties
     }
 }

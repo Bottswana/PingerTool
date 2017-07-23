@@ -7,16 +7,27 @@ namespace PingerTool.Windows
 {
 	public partial class AddDialog
 	{
+        private bool _EditMode = false;
         private AddDialogModel _Model;
 		private MainWindow _Window;
+        private IPAddress _OrigIP;
 
         #region Initialiser
-		public AddDialog(MainWindow Window)
+		public AddDialog(MainWindow Window, IPAddress Address = null, string DisplayName = null)
 		{
             InitializeComponent();
 
             _Model = (AddDialogModel)DataContext;
 			_Window = Window;
+
+            // Populate info if in edit mode
+            if( Address != null && DisplayName != null )
+            {
+                _Model.IPAddress = Address.ToString();
+                _Model.DisplayName = DisplayName;
+                _OrigIP = Address;
+                _EditMode = true;
+            }
 		}
         #endregion Initialiser
 
@@ -31,9 +42,29 @@ namespace PingerTool.Windows
                 // We need to convert the text IP to the IPAddress class.
                 if( IPAddress.TryParse(_Model.IPAddress, out IPAddress ParsedAddress) )
                 {
-                    // Add Ping Check
-                    if( _Window.CreatePingElement(_Model.DisplayName, ParsedAddress) ) Close();
-                    else MessageBox.Show("This IP Address already has a check associated to it", "Whoops", MessageBoxButton.OK, MessageBoxImage.Information);
+                    if( _EditMode )
+                    {
+                        // Edit existing check
+                        if( _OrigIP.Equals(ParsedAddress) )
+                        {
+                            // Just update name
+                            _Window.UpdatePingElementName(ParsedAddress, _Model.DisplayName);
+                            Close();
+                        }
+                        else
+                        {
+                            // Update address (and/or name)
+                            _Window.UpdatePingElementName(_OrigIP, _Model.DisplayName);
+                            if( _Window.UpdatePingElementAddress(_OrigIP, ParsedAddress) ) Close();
+                            else MessageBox.Show("This IP Address already has a check associated to it", "Whoops", MessageBoxButton.OK, MessageBoxImage.Information);
+                        }
+                    }
+                    else
+                    {
+                        // Add ping Check
+                        if( _Window.CreatePingElement(_Model.DisplayName, ParsedAddress) ) Close();
+                        else MessageBox.Show("This IP Address already has a check associated to it", "Whoops", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
                 }
                 else
                 {

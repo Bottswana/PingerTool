@@ -7,7 +7,7 @@
              xmlns:fa="http://schemas.fontawesome.io/icons/"
              xmlns:local="clr-namespace:PingerTool.Controls"
              DataContextChanged="Window_DataContextChanged"
-             Unloaded="UserControl_Unloaded"
+             Unloaded="_UserControl_Unloaded"
              d:DesignHeight="300"
              d:DesignWidth="500"
              mc:Ignorable="d">
@@ -38,6 +38,24 @@
                 </Label.Content>
             </Label>
             <Label ContentStringFormat="Last Contact: {0}" Content="{Binding LastContact}" HorizontalAlignment="Left" Margin="8,35,0,0" VerticalAlignment="Top" FontSize="14" FontFamily="Segoe UI Light"/>
+
+            <Button Click="_Pause_Click" Width="20" Height="20" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="66,10" BorderBrush="LightGray">
+                <Button.Content>
+                    <fa:FontAwesome x:Name="Test" Icon="{Binding PauseIcon}" Foreground="Black" FontSize="10" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="-2" />
+                </Button.Content>
+            </Button>
+
+            <Button Click="_Edit_Click" Width="20" Height="20" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="38,10" BorderBrush="LightGray">
+                <Button.Content>
+                    <fa:FontAwesome Icon="Pencil" Foreground="Black" FontSize="10" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="-2" />
+                </Button.Content>
+            </Button>
+
+            <Button Click="_Delete_Click" Width="20" Height="20" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10" BorderBrush="LightGray">
+                <Button.Content>
+                    <fa:FontAwesome Icon="Trash" Foreground="Black" FontSize="10" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="-2" />
+                </Button.Content>
+            </Button>
         </Grid>
 
         <!-- Ping Container -->

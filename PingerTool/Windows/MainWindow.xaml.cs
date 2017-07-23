@@ -265,10 +265,8 @@ namespace PingerTool.Windows
             if( Elements == 0 ) return false;
 
             // Remove Elements
-            foreach( var Element in _Model.PingWindows.Where(q => { return q.Address.Equals(Address); }) )
-            {
-                _Model.PingWindows.Remove(Element);
-            }
+            var Element = _Model.PingWindows.First(q => { return q.Address.Equals(Address); });
+            _Model.PingWindows.Remove(Element);
 
             // Update Column Count
             var TotalCount = _Model.PingWindows.Count;
@@ -286,15 +284,39 @@ namespace PingerTool.Windows
         /// <param name="Address">IP Address of existing element</param>
         /// <param name="NewName">New name to use for element</param>
         /// <returns>True if updated, False if the element does not exist</returns>
-        public bool UpdatePingElement(IPAddress Address, string NewName)
+        public bool UpdatePingElementName(IPAddress Address, string NewName)
         {
             // Check it exists
             var Elements = _Model.PingWindows.Count(q => { return q.Address.Equals(Address); });
             if( Elements == 0 ) return false;
 
-            // Remove Elements
+            // Update Name
             var Element = _Model.PingWindows.First(q => { return q.Address.Equals(Address); });
             Element.DisplayName = NewName;
+
+            Proj?.TriggerSaveStatus();
+            return true;
+        }
+
+        /// <summary>
+        /// Update the Address of an existing Ping Element
+        /// </summary>
+        /// <param name="Address">IP Address of existing element</param>
+        /// <param name="NewAddress">New IP Address</param>
+        /// <returns>True if updated, False if the element does not exist</returns>
+        public bool UpdatePingElementAddress(IPAddress Address, IPAddress NewAddress)
+        {
+            // Check it exists
+            var Elements = _Model.PingWindows.Count(q => { return q.Address.Equals(Address); });
+            if( Elements == 0 ) return false;
+
+            // Check the new adddress does not exist
+            Elements = _Model.PingWindows.Count( q => { return q.Address.Equals(NewAddress); });
+            if( Elements != 0 ) return false;
+
+            // Update Address
+            var Element = _Model.PingWindows.First(q => { return q.Address.Equals(Address); });
+            Element.Address = NewAddress;
 
             Proj?.TriggerSaveStatus();
             return true;
