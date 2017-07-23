@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Net;
-using System.Linq;
 using System.Timers;
 using System.Windows;
 using System.Net.Sockets;
@@ -71,6 +70,7 @@ namespace PingerTool.Controls
             {
                 _Running = true;
                 var PingInfo = _Ping.Send(_Model.Address, 2000);
+                if( !_Running ) return; // This accounts for timers which were Disabled while the Ping request was pending
                 switch( PingInfo.Status )
                 {
                     case IPStatus.Success:
@@ -192,7 +192,7 @@ namespace PingerTool.Controls
     public class PingControlModel : ViewModel
     {
         #region Private Properties
-        private string _LastContact = "Just Now";
+        private string _LastContact = "Never";
         private Brush _Colour = Brushes.Gray;
 
         private string _DisplayContents;
