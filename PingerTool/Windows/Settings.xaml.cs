@@ -14,9 +14,15 @@ namespace PingerTool.Windows
 		public Settings(MainWindow Window)
 		{
             InitializeComponent();
+            _Model = new SettingsModel()
+            {
+                WarningThreshold = App.GetApp().WarningTimeframe,
+                PingTimeout = App.GetApp().TimeoutValue
 
-            _Model = (SettingsModel)DataContext;
-			_Window = Window;
+            };
+
+            DataContext = _Model;
+            _Window = Window;
 		}
         #endregion Initialiser
 
@@ -26,7 +32,23 @@ namespace PingerTool.Windows
         /// </summary>
 		private void _Save_Click(object sender, RoutedEventArgs e)
 		{
-            // Not implemented yet
+            // Save General Settings
+            if( _Model.WarningThreshold < 1 || _Model.PingTimeout < 1 )
+            {
+                MessageBox.Show("Please enter a valid Ping Timeout or Warning Threshold value", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var Ref = App.GetApp();
+            Ref.WarningTimeframe = _Model.WarningThreshold;
+            Ref.TimeoutValue = _Model.PingTimeout;
+            
+            // Save Webserver Settings
+
+
+            // Close Window
+            _Window.Proj?.TriggerSaveStatus();
+            Close();
 		}
 
 		/// <summary>
