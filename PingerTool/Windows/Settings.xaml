@@ -40,7 +40,7 @@
         <TextBox IsEnabled="{Binding EnableAuth}" Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Right" Height="23" Margin="0,320,15,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="140" Padding="5,2,0,0"/>
 
         <Label Content="Password:" HorizontalAlignment="Left" Margin="15,350,0,0" VerticalAlignment="Top"/>
-        <PasswordBox IsEnabled="{Binding EnableAuth}" HorizontalAlignment="Right" Height="23" Margin="0,352,15,0" VerticalAlignment="Top" Width="140" Padding="5,2,0,0"/>
+        <PasswordBox x:Name="Password" IsEnabled="{Binding EnableAuth}" HorizontalAlignment="Right" Height="23" Margin="0,352,15,0" VerticalAlignment="Top" Width="140" Padding="5,2,0,0"/>
 
         <Button Content="Save" HorizontalAlignment="Left" Margin="225,405,0,0" VerticalAlignment="Top" Width="75" Click="_Save_Click" IsDefault="True"/>
         <Button Content="Discard" HorizontalAlignment="Left" Margin="305,405,0,0" VerticalAlignment="Top" Width="75" Click="_Discard_Click" IsCancel="True"/>

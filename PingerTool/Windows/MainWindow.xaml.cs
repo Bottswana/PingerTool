@@ -9,6 +9,7 @@ using PingerTool.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
 using System.Globalization;
+using System.Windows.Input;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
@@ -20,6 +21,7 @@ namespace PingerTool.Windows
         private App _AppRef;
 
         public ProjectControl Proj;
+        public WebServer Server;
         public Log Log;
 
 		#region Initialiser
@@ -51,6 +53,31 @@ namespace PingerTool.Windows
 		#endregion Initialiser
 
         #region Window Events
+        /// <summary>
+        /// Window Closing Event
+        /// </summary>
+        private void _Window_Closing( object sender, System.ComponentModel.CancelEventArgs e )
+        {
+            if( !_AppRef.ConfirmApplicationShutdown() && e != null )
+            {
+                // Abort closing of window
+                e.Cancel = true;
+            }
+        }
+
+		/// <summary>
+		/// Event hander for Ctrl + s Keyboard Combo
+		/// </summary>
+		private void _Window_PreviewKeyDown(object sender, KeyEventArgs e)
+		{
+			if( e.Key == Key.S && e.KeyboardDevice.Modifiers == ModifierKeys.Control )
+			{
+				// Save Combination
+				Proj.SaveProject(Proj.sCurrentFile);
+				return;
+			}
+		}
+
 		/// <summary>
 		/// Event handler for opening a new project
 		/// </summary>

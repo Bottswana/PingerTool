@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Net;
 using System.Windows;
 using PingerTool.Classes;
 
@@ -11,18 +10,29 @@ namespace PingerTool.Windows
 		private MainWindow _Window;
 
         #region Initialiser
-		public Settings(MainWindow Window)
+		public Settings( MainWindow Window )
 		{
             InitializeComponent();
+            _Window = Window;
+
+            // Configure ViewModel
             _Model = new SettingsModel()
             {
+                EnableWebserver = ( _Window.Server != null ) ? true : false,
                 WarningThreshold = App.GetApp().WarningTimeframe,
                 PingTimeout = App.GetApp().TimeoutValue
-
             };
 
+            if( _Window.Server != null )
+            {
+                _Model.AllowedSubnet = String.Join(",", WebServer.AllowedSubnets);
+                Password.Password = WebServer.AuthDetails[1];
+                _Model.Username = WebServer.AuthDetails[0];
+                _Model.BindAddress = WebServer.BindAddress;
+                _Model.EnableAuth = WebServer.AuthEnabled;
+            }
+
             DataContext = _Model;
-            _Window = Window;
 		}
         #endregion Initialiser
 
@@ -30,8 +40,18 @@ namespace PingerTool.Windows
         /// <summary>
         /// Event handler for clicking the Save Button
         /// </summary>
-		private void _Save_Click(object sender, RoutedEventArgs e)
+		private void _Save_Click( object sender, RoutedEventArgs e )
 		{
+            // Password Safety Warning
+            if( _Model.EnableAuth && _Model.Username.Length > 0 && Password.Password.Length > 0 )
+            {
+                var Warning = "The password feature is basic and is sent and stored unencrypted\nPlease ensure you use a password that is not used elsewhere";
+                if( MessageBox.Show(Warning, "Warning", MessageBoxButton.OKCancel, MessageBoxImage.Warning) == MessageBoxResult.Cancel )
+                {
+                    return;
+                }
+            }
+
             // Save General Settings
             if( _Model.WarningThreshold < 1 || _Model.PingTimeout < 1 )
             {
@@ -42,9 +62,36 @@ namespace PingerTool.Windows
             var Ref = App.GetApp();
             Ref.WarningTimeframe = _Model.WarningThreshold;
             Ref.TimeoutValue = _Model.PingTimeout;
+
+            // Stop Webserver (If Running)
+            if( _Window.Server != null )
+            {
+                _Window.Server.Dispose();
+                _Window.Server = null;
+            }
             
             // Save Webserver Settings
+            if( _Model.EnableWebserver )
+            {
+                var WebPass = Password.Password;
+                if( _Model.BindAddress.Length < 0 )
+                {
+                    MessageBox.Show("Please enter a valid Bind Address", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+                else if( _Model.EnableAuth && ( WebPass.Length < 1 || _Model.Username.Length < 1 ) )
+                {
+                    MessageBox.Show("Please enter a valid Username or Password for authentication", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+                else if( _Model.AllowedSubnet.Length < 0 )
+                {
+                    _Model.AllowedSubnet = "0.0.0.0/0";
+                }
 
+                // Start Webserver
+                _Window.Server = new WebServer(_Model.BindAddress, _Model.AllowedSubnet, _Model.EnableAuth, _Model.Username, WebPass);
+            }
 
             // Close Window
             _Window.Proj?.TriggerSaveStatus();
@@ -54,7 +101,7 @@ namespace PingerTool.Windows
 		/// <summary>
 		/// Event handler for clicking the Discard Button
 		/// </summary>
-		private void _Discard_Click(object sender, RoutedEventArgs e)
+		private void _Discard_Click( object sender, RoutedEventArgs e )
 		{
 			Close();
 		}

@@ -68,7 +68,7 @@ namespace PingerTool
 		/// Exit application
 		/// </summary>
 		/// <param name="ForceQuit">False for graceful shutdown, true for forced</param>
-		public void ExitApplication(bool ForceQuit = false)
+		public void ExitApplication( bool ForceQuit = false )
 		{
 			if( ForceQuit )
 			{
@@ -76,61 +76,20 @@ namespace PingerTool
 			}
 			else
 			{
-				// Check if we need to save changes first
-				var MainWindow = ( this.Windows.Count > 0 ) ? (MainWindow)Windows[0] : null;
-				if( MainWindow != null && MainWindow.Proj.SaveNeeded )
-				{
-					var Question = MessageBox.Show("Do you wish to save changes to this project before exiting?", "Confirmation", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
-					if( Question == MessageBoxResult.Yes )
-					{
-						if( MainWindow.Proj.sCurrentFile == null )
-						{
-							// Open file is untitled, so open save as box
-							var FileDialog = new SaveFileDialog()
-							{
-								Filter			= "DPM Project Files (*.dpmproj)|*.dpmproj",
-								Title			= "Save Project As",
-								DefaultExt		= ".dpmproj",
-								CheckPathExists = true,
-								OverwritePrompt = true,
-								ValidateNames	= true,
-								AddExtension	= true
-							};
-
-							if( FileDialog.ShowDialog() != true ) return;
-							if( !MainWindow.Proj.SaveProject(FileDialog.FileName) )
-							{
-								// Save Error
-								MessageBox.Show("A save error has occoured, please check you have permission to save to this location.", "Save Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-								return;
-							}
-						}
-						else
-						{
-							if( !MainWindow.Proj.SaveProject(MainWindow.Proj.sCurrentFile) )
-							{
-								// Save Error
-								MessageBox.Show("A save error has occoured, please check you have permission to save to this location.", "Save Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-								return;
-							}
-						}
-					}
-					else if( Question == MessageBoxResult.Cancel )
-					{
-						return;
-					}
-				}
-
-				// Exit Application
-				Application.Current.Shutdown();
+				if( ConfirmApplicationShutdown() )
+                {
+				    // Exit Application
+				    Application.Current.Shutdown();
+                }
 			}
 		}
 
-		/// <summary>
-		/// Windows Logoff/Shutdown
-		/// </summary>
-		private void Application_SessionEnding(object sender, SessionEndingCancelEventArgs e)
-		{
+        /// <summary>
+        /// Confirm if an application shutdown is permitted
+        /// </summary>
+        /// <returns>True if allowed, false otherwise</returns>
+        public bool ConfirmApplicationShutdown()
+        {
 			// Check if we need to save changes to our project
 			var MainWindow = (MainWindow)Windows[0];
 			if( MainWindow.Proj.SaveNeeded )
@@ -141,24 +100,22 @@ namespace PingerTool
 					if( MainWindow.Proj.sCurrentFile == null )
 					{
 						// Open file is untitled, so open save as box
-						var FileDialog = new SaveFileDialog()
-						{
-							Filter			= "DPM Project Files (*.dpmproj)|*.dpmproj",
-							Title			= "Save Project As",
-							DefaultExt		= ".dpmproj",
-							CheckPathExists = true,
-							OverwritePrompt = true,
-							ValidateNames	= true,
-							AddExtension	= true
-						};
+				        var FileDialog = new OpenFileDialog()
+				        {
+				            Filter			= "Project Files (*.pingtool)|*.pingtool",
+				            Title			= "Save Project As",
+				            DefaultExt		= ".pingtool",
+					        CheckPathExists = true,
+					        ValidateNames	= true,
+					        AddExtension	= true
+				        };
 
-						if( FileDialog.ShowDialog() != true ) { e.Cancel = true; return; }
+						if( FileDialog.ShowDialog() != true ) { return false; }
 						if( !MainWindow.Proj.SaveProject(FileDialog.FileName) )
 						{
 							// Save Error
 							MessageBox.Show("A save error has occoured, please check you have permission to save to this location.", "Save Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-							if( e != null ) e.Cancel = true;
-							return;
+							return false;
 						}
 					}
 					else
@@ -167,22 +124,37 @@ namespace PingerTool
 						{
 							// Save Error
 							MessageBox.Show("A save error has occoured, please check you have permission to save to this location.", "Save Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-							if( e != null ) e.Cancel = true;
-							return;
+                            return false;
 						}
 					}
 				}
 				else if( Question == MessageBoxResult.Cancel )
 				{
-					if( e != null ) e.Cancel = true;
-					return;
+                    return false;
 				}
 			}
-		}
-        #endregion Public Methods
-	}
 
-	static class Helpers
+            // Allow shutdown
+            return true;
+        }
+        #endregion Public Methods
+
+        #region Application Events
+		/// <summary>
+		/// Windows Logoff/Shutdown
+		/// </summary>
+		private void _Application_SessionEnding( object sender, SessionEndingCancelEventArgs e )
+		{
+			if( !ConfirmApplicationShutdown() && e != null )
+            {
+                // Cancel Shutdown
+                e.Cancel = true;
+            }
+		}
+        #endregion Application Events
+    }
+
+    static class Helpers
 	{
         #region Global Helper Methods
 		public static void ExceptionHandler(object sender, UnhandledExceptionEventArgs e)

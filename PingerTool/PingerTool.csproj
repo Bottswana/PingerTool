@@ -116,7 +116,9 @@
     <Compile Include="Classes\AutoScrollTextbox.cs" />
     <Compile Include="Classes\Log.cs" />
     <Compile Include="Classes\ProjectControl.cs" />
+    <Compile Include="Classes\ThirdParty\EmbeddedStaticContentConverstionBuilder.cs" />
     <Compile Include="Classes\ViewModel.cs" />
+    <Compile Include="Classes\WebServer.cs" />
     <Compile Include="Controls\PingControl.xaml.cs">
       <DependentUpon>PingControl.xaml</DependentUpon>
     </Compile>
