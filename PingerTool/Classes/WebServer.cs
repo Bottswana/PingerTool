@@ -111,8 +111,7 @@ namespace PingerTool.Classes
                 if( disposing )
                 {
                     // Dispose Managed Objects
-                    _Server?.Stop();
-                    _Server?.Dispose();
+                    if( _Server != null ) _Server.Dispose();
                     _Server = null;
                 }
 

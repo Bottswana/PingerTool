@@ -83,7 +83,7 @@ namespace PingerTool.Controls
                         else _Model.DisplayContents += $"Reply from {PingInfo.Address}: bytes={PingInfo.Buffer.Length} time{Time} TTL={PingInfo.Options.Ttl} count={_Count}\n";
                         _Model.LastContact = DateTime.Now.ToString();
 
-                        if( PingInfo.RoundtripTime > _AppRef.WarningTimeframe ) _Model.Colour = Brushes.Orange;
+                        if( PingInfo.RoundtripTime > _AppRef.WarningTimeframe ) _Model.Colour = Brushes.DarkOrange;
                         else _Model.Colour = Brushes.Green;
                         _Count++;
                         break;
@@ -165,16 +165,8 @@ namespace PingerTool.Controls
         /// </summary>
 		private void _Pause_Click(object sender, RoutedEventArgs e)
 		{
-            if( _Timer.Enabled )
-            {
-                _Model.PauseIcon = FontAwesomeIcon.Play;
-                PauseControl();
-            }
-            else
-            {
-                _Model.PauseIcon = FontAwesomeIcon.Pause;
-                ResumeControl();
-            }
+            if( _Timer.Enabled ) PauseControl();
+            else ResumeControl();
 		}
 
         /// <summary>
@@ -216,7 +208,8 @@ namespace PingerTool.Controls
         {
             if( !_Timer.Enabled ) return false;
             _Model.DisplayContents = "Ping Control Paused\n";
-            _Model.Colour = Brushes.Orange;
+            _Model.PauseIcon = FontAwesomeIcon.Play;
+            _Model.Colour = Brushes.DarkOrange;
 
             _Timer.Enabled = false;
             _Running = false;
@@ -230,6 +223,7 @@ namespace PingerTool.Controls
         public bool ResumeControl()
         {
             if( _Timer.Enabled ) return false;
+            _Model.PauseIcon = FontAwesomeIcon.Pause;
             _Model.DisplayContents = "";
             _Count = 1;
             
