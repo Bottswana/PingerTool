@@ -18,7 +18,7 @@ namespace PingerTool.Classes
      * Save details in project
      * Authentication doesnt work
      * Allowed Subnets not finished
-     * Nancy bug where we get an exception if we stop then start. FInd workaround and report to their github.
+     * Nancy bug where we get an exception if we stop then start. Find workaround and report to their github.
      */
 
     public class WebServer : IDisposable
