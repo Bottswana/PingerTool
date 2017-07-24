@@ -79,12 +79,39 @@
                 </TextBlock.Text>
             </TextBlock>
 
-            <Label Margin="0,100,0,0" Content="This product contains the following MIT licensed code (Unless otherwise stated):" FontSize="14" FontFamily="Segoe UI" />
-            <Label Margin="15,125,0,0" Content="* Fluent.Ribbon - Contextual modern ribbon interface for WPF (https://github.com/fluentribbon/Fluent.Ribbon)" FontSize="14" FontFamily="Segoe UI Light" />
-            <Label Margin="15,145,0,0" Content="* FontAwesome.WPF - FontAwesome for WPF (https://github.com/charri/Font-Awesome-WPF)" FontSize="14" FontFamily="Segoe UI Light" />
-            <Label Margin="15,165,0,0" Content="* Newtonsoft.JSON - .Net JSON conversion library (http://www.newtonsoft.com/json)" FontSize="14" FontFamily="Segoe UI Light" />
-            <Label Margin="15,185,0,0" Content="* log4net - Log framework for .Net (Apache 2.0 License) (https://logging.apache.org/log4net)" FontSize="14" FontFamily="Segoe UI Light" />
-            <Label Margin="15,205,0,0" Content="* Nancy - .Net Web framework (https://github.com/NancyFx/Nancy)" FontSize="14" FontFamily="Segoe UI Light" />
+            <Label Margin="0,105,0,0" Content="This product contains the following MIT licensed code (Unless otherwise stated):" FontSize="14" FontFamily="Segoe UI" />
+            <Label Margin="15,135,0,0" Content="* Fluent.Ribbon - Contextual modern ribbon interface for WPF (https://github.com/fluentribbon/Fluent.Ribbon)" FontSize="14" FontFamily="Segoe UI Light" />
+            <Label Margin="15,155,0,0" Content="* IPNetwork - .Net Subnet Utilities (BSD 2-Clause License) (https://github.com/lduchosal/ipnetwork)" FontSize="14" FontFamily="Segoe UI Light" />
+            <Label Margin="15,175,0,0" Content="* FontAwesome.WPF - FontAwesome for WPF (https://github.com/charri/Font-Awesome-WPF)" FontSize="14" FontFamily="Segoe UI Light" />
+            <Label Margin="15,195,0,0" Content="* log4net - Log framework for .Net (Apache 2.0 License) (https://logging.apache.org/log4net)" FontSize="14" FontFamily="Segoe UI Light" />
+            <Label Margin="15,215,0,0" Content="* Newtonsoft.JSON - .Net JSON conversion library (http://www.newtonsoft.com/json)" FontSize="14" FontFamily="Segoe UI Light" />
+            <Label Margin="15,235,0,0" Content="* Fody/Costura - Embedded Assemblies (https://github.com/Fody/Fody)" FontSize="14" FontFamily="Segoe UI Light" />
+            <Label Margin="15,255,0,0" Content="* Nancy - .Net Web framework (https://github.com/NancyFx/Nancy)" FontSize="14" FontFamily="Segoe UI Light" />
+            <Label Margin="15,275,0,0" Content="* ControlzEx (https://github.com/ControlzEx/ControlzEx)" FontSize="14" FontFamily="Segoe UI Light" />
+
+            <Label Margin="0,320,0,0" Content="Please see the included LICENSE.txt for a copy of the individual licenses used in this product." FontSize="14" FontFamily="Segoe UI" />
+            <Label Margin="0,340,0,0" Content="This product is licensed under the MIT License." FontSize="14" FontFamily="Segoe UI" />
+            <TextBlock Margin="20,380,0,0" FontSize="12" FontFamily="Segoe UI Light">
+                Copyright (c) 2017 James Botting<LineBreak/><LineBreak/>
+                The MIT License (MIT)<LineBreak/><LineBreak/>
+                Permission is hereby granted, free of charge, to any person obtaining a copy<LineBreak/>
+                of this software and associated documentation files (the "Software"), to deal<LineBreak/>
+                in the Software without restriction, including without limitation the rights<LineBreak/>
+                to use, copy, modify, merge, publish, distribute, sublicense, and/or sell<LineBreak/>
+                copies of the Software, and to permit persons to whom the Software is<LineBreak/>
+                furnished to do so, subject to the following conditions:<LineBreak/><LineBreak/>
+
+                The above copyright notice and this permission notice shall be included in all<LineBreak/>
+                copies or substantial portions of the Software.<LineBreak/><LineBreak/>
+
+                THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR<LineBreak/>
+                IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,<LineBreak/>
+                FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE<LineBreak/>
+                AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER<LineBreak/>
+                LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,<LineBreak/>
+                OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE<LineBreak/>
+                SOFTWARE.
+            </TextBlock>
         </Grid>
 
     </Window.Resources>
