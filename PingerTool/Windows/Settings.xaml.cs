@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using PingerTool.Classes;
+using LukeSkywalker.IPNetwork;
 
 namespace PingerTool.Windows
 {
@@ -84,6 +85,18 @@ namespace PingerTool.Windows
                 {
                     MessageBox.Show("Please enter a valid Username for authentication", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
+                }
+                else if( _Model.AllowedSubnet.Length > 0 )
+                {
+                    var Elements = _Model.AllowedSubnet.Split(',');
+                    foreach( var Element in Elements )
+                    {
+                        if( !IPNetwork.TryParse(Element, out IPNetwork Net) )
+                        {
+                            MessageBox.Show($"Entry '{Element}' is not a valid subnet.\nPlease correct the Allowed Subnets before continuing", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                            return;
+                        }
+                    }
                 }
                 else if( _Model.AllowedSubnet.Length < 0 )
                 {
