@@ -6,6 +6,7 @@ using Microsoft.Win32;
 using System.Reflection;
 using PingerTool.Classes;
 using PingerTool.Windows;
+using LukeSkywalker.IPNetwork;
 
 namespace PingerTool
 {
@@ -157,7 +158,7 @@ namespace PingerTool
     static class Helpers
 	{
         #region Global Helper Methods
-		public static void ExceptionHandler(object sender, UnhandledExceptionEventArgs e)
+		public static void ExceptionHandler( object sender, UnhandledExceptionEventArgs e )
 		{
 			var Exception = ( e.ExceptionObject as Exception );
 
@@ -165,30 +166,38 @@ namespace PingerTool
 			EmergencyLog.Fatal("Fatal Application Exception", Exception);
 		}
 
-		public static string Base64Decode(string EncodedData)
-		{
-            var StringData = EncodedData.Trim().Replace("\0", "");
-            return Encoding.ASCII.GetString(Convert.FromBase64String(StringData));
+        public static bool ContainsAddress( this IPNetwork Net, string Address )
+        {
+            // Get Bytes
+            var LowerEnd = Net.FirstUsable.GetAddressBytes();
+            var UpperEnd = Net.LastUsable.GetAddressBytes();
+
+            // Parse IP
+            if( System.Net.IPAddress.TryParse(Address, out System.Net.IPAddress ParsedAddress) )
+            {
+                var addressBytes = ParsedAddress.GetAddressBytes();
+                bool Lower = true, Upper = true;
+
+                for( int i = 0; i < LowerEnd.Length && (Lower || Upper); i++ )
+                {
+                    if( (Lower && addressBytes[i] < LowerEnd[i]) || (Upper && addressBytes[i] > UpperEnd[i]) )
+                    {
+                        return false;
+                    }
+
+                    Lower &= (addressBytes[i] == LowerEnd[i]);
+                    Upper &= (addressBytes[i] == UpperEnd[i]);
+                }
+
+                return true;
+            }
+            else
+            {
+                throw new ArgumentException("Invalid Address");
+            }
         }
 
-		public static string Base64Decode(byte[] EncodedData)
-		{
-            var StringData = Encoding.ASCII.GetString(EncodedData).Trim().Replace("\0", "");
-			return Encoding.UTF8.GetString(Convert.FromBase64String(StringData));
-		}
-
-		public static string Base64Encode(string RawData)
-		{
-			var ByteArray = Encoding.ASCII.GetBytes(RawData);
-			return Convert.ToBase64String(ByteArray);
-		}
-
-		public static string Base64Encode(byte[] RawData)
-		{
-			return Convert.ToBase64String(RawData);
-		}
-
-		public static string SHA256Hash(string RawData)
+		public static string SHA256Hash( string RawData )
 		{
 			var HashFactory = new System.Security.Cryptography.SHA256Managed();
 
@@ -230,17 +239,17 @@ namespace PingerTool
 		}
 
 		static readonly DateTime epochStart = new DateTime(1970, 1, 1, 0, 0, 0);
-		public static DateTime FromUnixStamp(long secondsSinceepoch)
+		public static DateTime FromUnixStamp( long secondsSinceepoch )
 		{
 			return epochStart.ToUniversalTime().AddSeconds(secondsSinceepoch).ToLocalTime();
 		}
 
-		public static long ToUnixStamp(DateTime dateTime)
+		public static long ToUnixStamp( DateTime dateTime )
 		{
 			return (long)( dateTime.ToUniversalTime() - epochStart ).TotalSeconds;
 		}
 		
-		public static long ToUnixStamp(DateTime? dateTime)
+		public static long ToUnixStamp( DateTime? dateTime )
 		{
 			if( dateTime == null ) return 0;
 		

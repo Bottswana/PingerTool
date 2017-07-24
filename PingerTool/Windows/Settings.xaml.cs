@@ -25,11 +25,10 @@ namespace PingerTool.Windows
 
             if( _Window.Server != null )
             {
-                _Model.AllowedSubnet = String.Join(",", WebServer.AllowedSubnets);
-                Password.Password = WebServer.AuthDetails[1];
-                _Model.Username = WebServer.AuthDetails[0];
-                _Model.BindAddress = WebServer.BindAddress;
-                _Model.EnableAuth = WebServer.AuthEnabled;
+                _Model.AllowedSubnet = String.Join(",", _Window.Server.AllowedSubnets);
+                _Model.Username = _Window.Server.AuthDetails[0];
+                _Model.BindAddress = _Window.Server.BindAddress;
+                _Model.EnableAuth = _Window.Server.AuthEnabled;
             }
 
             DataContext = _Model;
@@ -64,8 +63,10 @@ namespace PingerTool.Windows
             Ref.TimeoutValue = _Model.PingTimeout;
 
             // Stop Webserver (If Running)
+            var OldPassword = "";
             if( _Window.Server != null )
             {
+                OldPassword = _Window.Server.AuthDetails[1];
                 _Window.Server.Dispose();
                 _Window.Server = null;
             }
@@ -79,9 +80,9 @@ namespace PingerTool.Windows
                     MessageBox.Show("Please enter a valid Bind Address", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
-                else if( _Model.EnableAuth && ( WebPass.Length < 1 || _Model.Username.Length < 1 ) )
+                else if( _Model.EnableAuth && _Model.Username.Length < 1 )
                 {
-                    MessageBox.Show("Please enter a valid Username or Password for authentication", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show("Please enter a valid Username for authentication", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
                 else if( _Model.AllowedSubnet.Length < 0 )
@@ -90,7 +91,8 @@ namespace PingerTool.Windows
                 }
 
                 // Start Webserver
-                _Window.Server = new WebServer(_Model.BindAddress, _Model.AllowedSubnet, _Model.EnableAuth, _Model.Username, WebPass);
+                var tPassword = ( OldPassword != "" && WebPass.Length < 1 ) ? OldPassword : Helpers.SHA256Hash(WebPass);
+                _Window.Server = new WebServer(_Model.BindAddress, _Model.AllowedSubnet, _Model.EnableAuth, _Model.Username, tPassword);
             }
 
             // Close Window

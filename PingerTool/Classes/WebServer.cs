@@ -7,28 +7,21 @@ using Nancy.ViewEngines;
 using Nancy.Conventions;
 using Nancy.Hosting.Self;
 using Nancy.Bootstrapper;
+using PingerTool.Windows;
+using LukeSkywalker.IPNetwork;
 using Nancy.Embedded.Conventions;
 using Nancy.Authentication.Basic;
 using System.Collections.Generic;
 
 namespace PingerTool.Classes
 {
-    /*
-     * Problems:
-     * Save details in project
-     * Authentication doesnt work
-     * Allowed Subnets not finished
-     * Nancy bug where we get an exception if we stop then start. Find workaround and report to their github.
-     */
-
     public class WebServer : IDisposable
     {
-        public static string[] AllowedSubnets = {"0.0.0.0/0"}; // TODO: Implement This!
-        public static string[] AuthDetails = {"", ""};
-        public static string BindAddress = "";
-
-        public static bool AuthEnabled = false;
-        public static bool UseEmbedded = false;
+        public readonly string[] AllowedSubnets = {"127.0.0.0/8"};
+        public readonly string[] AuthDetails = {"", ""};
+        public readonly string BindAddress = "";
+        public readonly bool AuthEnabled = false;
+        public readonly bool UseEmbedded = false;
 
         private bool _DisposedValue = false;
         private NancyHost _Server;
@@ -63,7 +56,7 @@ namespace PingerTool.Classes
             }
             else
             {
-                WebServer.AllowedSubnets = AllowedSubnets.Split(',');
+                this.AllowedSubnets = AllowedSubnets.Split(',');
             }
 
             // Start Webserver
@@ -77,7 +70,7 @@ namespace PingerTool.Classes
                     }
                 };
 
-                WebServer.BindAddress = BindAddress;
+                this.BindAddress = BindAddress;
                 if( BindAddress.ToString().Contains("0.0.0.0") )
                 {
                     // Rewrite 0.0.0.0 wildcard to bind to all IPs via Nancys RewriteLocalhost feature
@@ -134,19 +127,26 @@ namespace PingerTool.Classes
                 public IEnumerable<string> Claims { get; set; }
             }
 
-            public IUserIdentity Validate(string username, string password)
+            public IUserIdentity Validate( string username, string password )
             {
-                if( username.Equals(AuthDetails[0]) && password.Equals(AuthDetails[1]) )
+                return Application.Current.Dispatcher.Invoke(() =>
                 {
-                    return new UserIdentity()
+                    var MWindow = (MainWindow)App.GetApp()?.MainWindow;
+                    if( MWindow != null && MWindow.Server != null )
                     {
-                        UserName = username,
-                        Claims = null
-                    };
-                }
+                        if( username.Equals(MWindow.Server.AuthDetails[0]) && MWindow.Server.AuthDetails[1].Equals(Helpers.SHA256Hash(password)) )
+                        {
+                            return new UserIdentity()
+                            {
+                                UserName = username,
+                                Claims = null
+                            };
+                        }
+                    }
 
-                // Failed Login
-                return null;
+                    // Failed Login
+                    return null;
+                });
             }
         }
         #endregion Basic Authentication
@@ -158,49 +158,42 @@ namespace PingerTool.Classes
 
         #region Custom Bootstrap
 		/// <summary>
-		/// Configure view load from Embedded Resources
-		/// </summary>
-		protected override void ConfigureApplicationContainer(TinyIoCContainer container)
-		{
-			base.ConfigureApplicationContainer(container);
-			ResourceViewLocationProvider.RootNamespaces.Add(GetType().Assembly, "PingerTool.Views");
-		}
-
-		/// <summary>
 		/// Configure static resource load from Embedded Resources
 		/// </summary>
-		protected override void ConfigureConventions(NancyConventions nancyConventions)
+		protected override void ConfigureConventions( NancyConventions nancyConventions )
 		{
 			base.ConfigureConventions(nancyConventions);
-            if( WebServer.UseEmbedded )
-			{
-				// Use embedded static resources
-				foreach( var Dir in StaticDirectories )
-				{
-					nancyConventions.StaticContentsConventions.Add(EmbeddedStaticContentConventionBuilder.AddDirectory(Dir, GetType().Assembly, Dir));
-				}
-			}
-			else
-			{
-				// Use static resources on filesystem
-				foreach( var Dir in StaticDirectories )
-				{
-					nancyConventions.StaticContentsConventions.Add(StaticContentConventionBuilder.AddDirectory(Dir));
-				}
-			}
+
+            var MWindow = (MainWindow)App.GetApp()?.MainWindow;
+            if( MWindow != null && MWindow.Server != null )
+            {
+                if( MWindow.Server.UseEmbedded )
+			    {
+				    // Use embedded static resources
+				    foreach( var Dir in StaticDirectories )
+				    {
+					    nancyConventions.StaticContentsConventions.Add(EmbeddedStaticContentConventionBuilder.AddDirectory(Dir, GetType().Assembly, Dir));
+				    }
+			    }
+			    else
+			    {
+				    // Use static resources on filesystem
+				    foreach( var Dir in StaticDirectories )
+				    {
+					    nancyConventions.StaticContentsConventions.Add(StaticContentConventionBuilder.AddDirectory(Dir));
+				    }
+			    }
+            }
 		}
 
 		/// <summary>
 		/// Configure authentication mode
 		/// </summary>
-		protected override void ApplicationStartup(TinyIoCContainer container, IPipelines pipelines)
+		protected override void ApplicationStartup( TinyIoCContainer container, IPipelines pipelines )
 		{
 			base.ApplicationStartup(container, pipelines);
-            if( WebServer.AuthEnabled )
-            {
-			    var Authentication = new BasicAuthenticationConfiguration(container.Resolve<IUserValidator>(), "PingerTool Login");
-			    pipelines.EnableBasicAuthentication(Authentication);
-            }
+			var Authentication = new BasicAuthenticationConfiguration(container.Resolve<IUserValidator>(), "PingerTool Login");
+			pipelines.EnableBasicAuthentication(Authentication);
 		}
         #endregion Custom Bootstrap
 
@@ -210,13 +203,83 @@ namespace PingerTool.Classes
 			get { return NancyInternalConfiguration.WithOverrides(OnConfigurationBuilder); }
 		}
 
-		void OnConfigurationBuilder(NancyInternalConfiguration x)
+		void OnConfigurationBuilder( NancyInternalConfiguration x )
 		{
-			if( WebServer.UseEmbedded )
-			{
-				x.ViewLocationProvider = typeof(ResourceViewLocationProvider);
-			}
+            var MWindow = (MainWindow)App.GetApp()?.MainWindow;
+            if( MWindow != null && MWindow.Server != null )
+            {
+			    if( MWindow.Server.UseEmbedded )
+			    {
+				    x.ViewLocationProvider = typeof(ResourceViewLocationProvider);
+			    }
+            }
 		}
 		#endregion Override for Embedded Views
+    }
+
+    public class WebModule : NancyModule
+    {
+        public MainWindow _Window;
+
+        #region Custom Module Base
+        public WebModule() : base()
+        {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                _Window = (MainWindow)App.GetApp()?.MainWindow;
+                if( _Window != null && _Window.Server != null && _Window.Server.AuthEnabled )
+                {
+                    this.RequiresAuthentication();
+                }
+            });
+        }
+
+        /// <summary>
+        /// Check if a client IP is allowed to view the page
+        /// </summary>
+        /// <param name="Client">IP Address of client</param>
+        /// <returns>True if allowed, false otherwise</returns>
+        public bool CheckWhitelisted(string Client)
+        {
+            if( Client == null ) return false;
+            foreach( var Subnet in _Window.Server.AllowedSubnets )
+            {
+                if( Subnet.Equals("0.0.0.0/0") )
+                {
+                    // All Subnets
+                    return true;
+                }
+                else
+                {
+                    // Validate Subnet
+                    var SubnetInstance = IPNetwork.Parse(Subnet);
+                    if( SubnetInstance.ContainsAddress(Client) ) return true;
+                }
+            }
+
+            // Not Authorized
+            return false;
+        }
+
+        /// <summary>
+        /// Returns an Unauthorized response to send to a client
+        /// </summary>
+        /// <returns>Response class</returns>
+        public Response ThrowUnauthorized()
+        {
+            // Return unauthorized response
+            return new Response()
+            {
+                StatusCode = HttpStatusCode.Forbidden,
+                Contents = s =>
+                {
+                    using( var Writer = new System.IO.StreamWriter(s) )
+                    {
+                        Writer.WriteLine("HTTP 403 Unauthorized.<br />Your IP is not approved to access this facility");
+                    }
+                }
+            };
+        }
+        #endregion Custom Module Base
     }
 }

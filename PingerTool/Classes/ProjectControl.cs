@@ -50,7 +50,16 @@ namespace PingerTool.Classes
 		{
 			// Clear the data from the MainWindow Model
 			_Window.Title = "PingerTool - Untitled Project*";
+            _AppRef.WarningTimeframe = 2000;
+            _AppRef.TimeoutValue = 2000;
             _Window.ClearAllElements();
+
+            // Shut down webserver
+            if( _Window.Server != null )
+            {
+                _Window.Server.Dispose();
+                _Window.Server = null;
+            }
 
             sCurrentFile = null;
 			SaveNeeded = true;
@@ -63,6 +72,14 @@ namespace PingerTool.Classes
 			{
 				// Get FileData
 				var FileObject = JsonConvert.DeserializeObject<SaveFileData>(File.ReadAllText(FilePath));
+                _Window.ClearAllElements();
+
+                // Shut down webserver
+                if( _Window.Server != null )
+                {
+                    _Window.Server.Dispose();
+                    _Window.Server = null;
+                }
 
                 // Restore Data
                 _AppRef.TimeoutValue = FileObject.PingTimeout;
@@ -84,6 +101,18 @@ namespace PingerTool.Classes
                             _AppRef.Log.Warn("Unable to import PingElement due to invalid address: {0}", PingElement.Address);
                         }
                     }
+                }
+
+                // Restore Webserver
+                if( FileObject.WebEnabled )
+                {
+                    _Window.Server = new WebServer(
+                        FileObject.WebBindAddress,
+                        FileObject.WebAllowedSubnets,
+                        FileObject.WebAuthEnabled,
+                        FileObject.WebUsername,
+                        FileObject.WebPassword 
+                    );
                 }
 
 				// Restore Environment
@@ -117,7 +146,13 @@ namespace PingerTool.Classes
 				// Convert into file data
 				var FileData = JsonConvert.SerializeObject(new SaveFileData()
 				{
+                    WebAllowedSubnets = ( _Window.Server != null ) ? String.Join(",", _Window.Server.AllowedSubnets) : null,
+                    WebAuthEnabled = ( _Window.Server != null ) ? _Window.Server.AuthEnabled : false,
+                    WebBindAddress = ( _Window.Server != null ) ? _Window.Server.BindAddress : null,
+                    WebPassword = ( _Window.Server != null ) ? _Window.Server.AuthDetails[1] : null,
+                    WebUsername = ( _Window.Server != null ) ? _Window.Server.AuthDetails[0] : null,
                     WarningThreshold = _AppRef.WarningTimeframe,
+                    WebEnabled = ( _Window.Server != null ),
                     PingTimeout = _AppRef.TimeoutValue,
                     PingElements = PingWindow
 				});
@@ -194,6 +229,36 @@ namespace PingerTool.Classes
         /// Ping timeout value
         /// </summary>
         public int PingTimeout { get; set; }
+
+        /// <summary>
+        /// Address to bind webserver to
+        /// </summary>
+        public string WebBindAddress { get; set; }
+
+        /// <summary>
+        /// Allowed subnets for webserver
+        /// </summary>
+        public string WebAllowedSubnets { get; set; }
+
+        /// <summary>
+        /// Username for webserver authentication
+        /// </summary>
+        public string WebUsername { get; set; }
+
+        /// <summary>
+        /// Password for webserver authentication
+        /// </summary>
+        public string WebPassword { get; set; }
+
+        /// <summary>
+        /// If webserver is enabled
+        /// </summary>
+        public bool WebEnabled { get; set; }
+
+        /// <summary>
+        /// If webserver auth is enabled
+        /// </summary>
+        public bool WebAuthEnabled { get; set; }
         #endregion Save File Structure
 	}
 }
