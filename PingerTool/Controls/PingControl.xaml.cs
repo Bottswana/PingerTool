@@ -14,7 +14,7 @@ namespace PingerTool.Controls
 {
     public partial class PingControl : UserControl, IDisposable
     {
-        private static int _MaxContainerLines = 50;
+        private const int _MaxContainerLines = 50;
         private bool _DisposedValue = false;
         private bool _Running = false;
         private long _Count = 1;

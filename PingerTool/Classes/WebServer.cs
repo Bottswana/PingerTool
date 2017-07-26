@@ -171,23 +171,19 @@ namespace PingerTool.Classes
         {
             base.ConfigureConventions(nancyConventions);
 
-            var MWindow = (MainWindow)App.GetApp()?.MainWindow;
-            if( MWindow != null && MWindow.Server != null )
+            #if !DEBUG
+            // Use embedded static resources
+            foreach( var Dir in StaticDirectories )
             {
-                #if !DEBUG
-                // Use embedded static resources
-                foreach( var Dir in StaticDirectories )
-                {
-                    nancyConventions.StaticContentsConventions.Add(EmbeddedStaticContentConventionBuilder.AddDirectory(Dir, GetType().Assembly, Dir));
-                }
-                #else
-                // Use static resources on filesystem
-                foreach( var Dir in StaticDirectories )
-                {
-                    nancyConventions.StaticContentsConventions.Add(StaticContentConventionBuilder.AddDirectory(Dir));
-                }
-                #endif
+                nancyConventions.StaticContentsConventions.Add(EmbeddedStaticContentConventionBuilder.AddDirectory(Dir, GetType().Assembly, Dir));
             }
+            #else
+            // Use static resources on filesystem
+            foreach( var Dir in StaticDirectories )
+            {
+                nancyConventions.StaticContentsConventions.Add(StaticContentConventionBuilder.AddDirectory(Dir));
+            }
+            #endif
         }
 
         /// <summary>
@@ -210,11 +206,7 @@ namespace PingerTool.Classes
         void OnConfigurationBuilder( NancyInternalConfiguration x )
         {
             #if !DEBUG
-            var MWindow = (MainWindow)App.GetApp()?.MainWindow;
-            if( MWindow != null && MWindow.Server != null )
-            {
-                x.ViewLocationProvider = typeof(ResourceViewLocationProvider);
-            }
+            x.ViewLocationProvider = typeof(ResourceViewLocationProvider);
             #endif
         }
         #endregion Override for Embedded Views
