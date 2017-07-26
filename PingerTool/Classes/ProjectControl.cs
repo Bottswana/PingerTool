@@ -8,48 +8,48 @@ using System.Collections.Generic;
 
 namespace PingerTool.Classes
 {
-	public class ProjectControl
-	{
-		private MainWindow _Window;
-		public string sCurrentFile;
-		public bool SaveNeeded;
-		private App _AppRef;
+    public class ProjectControl
+    {
+        private MainWindow _Window;
+        public string sCurrentFile;
+        public bool SaveNeeded;
+        private App _AppRef;
 
-		#region Initialisation
-		public ProjectControl(MainWindow Window)
-		{
-			_AppRef = App.GetApp();
-			_Window = Window;
+        #region Initialisation
+        public ProjectControl(MainWindow Window)
+        {
+            _AppRef = App.GetApp();
+            _Window = Window;
 
-			sCurrentFile = null;
-			SaveNeeded = false;
+            sCurrentFile = null;
+            SaveNeeded = false;
 
-			// Open last opened file, or new workspace
-			var LastFile = GetLastOpenProject();
-			var FileOpen = false;
+            // Open last opened file, or new workspace
+            var LastFile = GetLastOpenProject();
+            var FileOpen = false;
 
-			if( LastFile.Length > 0 ) FileOpen = OpenProject(LastFile);
-			if( !FileOpen ) NewProject();
-		}
+            if( LastFile.Length > 0 ) FileOpen = OpenProject(LastFile);
+            if( !FileOpen ) NewProject();
+        }
 
-		/// <summary>
-		/// Trigger save required status
-		/// </summary>
-		public void TriggerSaveStatus()
-		{
-			if( !SaveNeeded )
+        /// <summary>
+        /// Trigger save required status
+        /// </summary>
+        public void TriggerSaveStatus()
+        {
+            if( !SaveNeeded )
             {
-			    _Window.Title = _Window.Title + "*";
-			    SaveNeeded = true;
+                _Window.Title = _Window.Title + "*";
+                SaveNeeded = true;
             }
-		}
-		#endregion Initialisation
+        }
+        #endregion Initialisation
 
-		#region Project Control
-		public bool NewProject()
-		{
-			// Clear the data from the MainWindow Model
-			_Window.Title = "PingerTool - Untitled Project*";
+        #region Project Control
+        public bool NewProject()
+        {
+            // Clear the data from the MainWindow Model
+            _Window.Title = "PingerTool - Untitled Project*";
             _AppRef.WarningTimeframe = 2000;
             _AppRef.TimeoutValue = 2000;
             _Window.ClearAllElements();
@@ -62,16 +62,16 @@ namespace PingerTool.Classes
             }
 
             sCurrentFile = null;
-			SaveNeeded = true;
-			return true;
-		}
+            SaveNeeded = true;
+            return true;
+        }
 
-		public bool OpenProject(string FilePath)
-		{
-			try
-			{
-				// Get FileData
-				var FileObject = JsonConvert.DeserializeObject<SaveFileData>(File.ReadAllText(FilePath));
+        public bool OpenProject(string FilePath)
+        {
+            try
+            {
+                // Get FileData
+                var FileObject = JsonConvert.DeserializeObject<SaveFileData>(File.ReadAllText(FilePath));
                 _Window.ClearAllElements();
 
                 // Shut down webserver
@@ -115,23 +115,23 @@ namespace PingerTool.Classes
                     );
                 }
 
-				// Restore Environment
-				_Window.Title = "PingerTool - " + Path.GetFileName(FilePath);
-				sCurrentFile = FilePath;
-				SaveNeeded = false;
-				return true;
-			}
-			catch( Exception Ex )
-			{
-				_AppRef.Log.Error(Ex, "Unable to open project");
-				return false;
-			}
-		}
+                // Restore Environment
+                _Window.Title = "PingerTool - " + Path.GetFileName(FilePath);
+                sCurrentFile = FilePath;
+                SaveNeeded = false;
+                return true;
+            }
+            catch( Exception Ex )
+            {
+                _AppRef.Log.Error(Ex, "Unable to open project");
+                return false;
+            }
+        }
 
-		public bool SaveProject(string FilePath)
-		{
-			try
-			{
+        public bool SaveProject(string FilePath)
+        {
+            try
+            {
                 // Get list of Ping Controls
                 var PingWindow = new List<SaveFileData.PingElement>();
                 foreach( var Element in _Window.GetAllElements() )
@@ -143,9 +143,9 @@ namespace PingerTool.Classes
                     });
                 }
 
-				// Convert into file data
-				var FileData = JsonConvert.SerializeObject(new SaveFileData()
-				{
+                // Convert into file data
+                var FileData = JsonConvert.SerializeObject(new SaveFileData()
+                {
                     WebAllowedSubnets = ( _Window.Server != null ) ? String.Join(",", _Window.Server.AllowedSubnets) : null,
                     WebAuthEnabled = ( _Window.Server != null ) ? _Window.Server.AuthEnabled : false,
                     WebBindAddress = ( _Window.Server != null ) ? _Window.Server.BindAddress : null,
@@ -155,59 +155,59 @@ namespace PingerTool.Classes
                     WebEnabled = ( _Window.Server != null ),
                     PingTimeout = _AppRef.TimeoutValue,
                     PingElements = PingWindow
-				});
+                });
 
-				// Write to file
-				File.WriteAllText(FilePath, FileData);
+                // Write to file
+                File.WriteAllText(FilePath, FileData);
 
-				// Update Environment
-				_Window.Title = "PingerTool - " + Path.GetFileName(FilePath);
-				sCurrentFile = FilePath;
-				SaveNeeded = false;
-				return true;
-			}
-			catch( Exception Ex )
-			{
-				_AppRef.Log.Error(Ex, "Unable to save project");
-				return false;
-			}
-		}
-		#endregion Project Control
+                // Update Environment
+                _Window.Title = "PingerTool - " + Path.GetFileName(FilePath);
+                sCurrentFile = FilePath;
+                SaveNeeded = false;
+                return true;
+            }
+            catch( Exception Ex )
+            {
+                _AppRef.Log.Error(Ex, "Unable to save project");
+                return false;
+            }
+        }
+        #endregion Project Control
 
-		#region Project Info
-		/// <summary>
-		/// Get last open file
-		/// </summary>
-		/// <returns>File path of file</returns>
-		public string GetLastOpenProject()
-		{
-			try
-			{
-				var RootKey = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Default);
-				var TSKey = RootKey.OpenSubKey(@"Software\PingerTool", true);
-				if( TSKey != null )
-				{
-					// Key Exists
-					return (string)TSKey.GetValue("LastFile", "");
-				}
-				else
-				{
-					// Create new key
-					TSKey = RootKey.CreateSubKey(@"Software\PingerTool");
-					return "";
-				}
-			}
-			catch( Exception Ex )
-			{
-				_AppRef.Log.Error(Ex, "Unable to access registry keys");
-				return null;
-			}
-		}
-		#endregion Project Info
-	}
+        #region Project Info
+        /// <summary>
+        /// Get last open file
+        /// </summary>
+        /// <returns>File path of file</returns>
+        public string GetLastOpenProject()
+        {
+            try
+            {
+                var RootKey = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Default);
+                var TSKey = RootKey.OpenSubKey(@"Software\PingerTool", true);
+                if( TSKey != null )
+                {
+                    // Key Exists
+                    return (string)TSKey.GetValue("LastFile", "");
+                }
+                else
+                {
+                    // Create new key
+                    TSKey = RootKey.CreateSubKey(@"Software\PingerTool");
+                    return "";
+                }
+            }
+            catch( Exception Ex )
+            {
+                _AppRef.Log.Error(Ex, "Unable to access registry keys");
+                return null;
+            }
+        }
+        #endregion Project Info
+    }
 
-	public class SaveFileData
-	{
+    public class SaveFileData
+    {
         #region Save File Structure
         public class PingElement
         {
@@ -260,5 +260,5 @@ namespace PingerTool.Classes
         /// </summary>
         public bool WebAuthEnabled { get; set; }
         #endregion Save File Structure
-	}
+    }
 }

@@ -5,14 +5,14 @@ using LukeSkywalker.IPNetwork;
 
 namespace PingerTool.Windows
 {
-	public partial class Settings
-	{
+    public partial class Settings
+    {
         private SettingsModel _Model;
-		private MainWindow _Window;
+        private MainWindow _Window;
 
         #region Initialiser
-		public Settings( MainWindow Window )
-		{
+        public Settings( MainWindow Window )
+        {
             InitializeComponent();
             _Window = Window;
 
@@ -33,15 +33,15 @@ namespace PingerTool.Windows
             }
 
             DataContext = _Model;
-		}
+        }
         #endregion Initialiser
 
-		#region Window Events
+        #region Window Events
         /// <summary>
         /// Event handler for clicking the Save Button
         /// </summary>
-		private void _Save_Click( object sender, RoutedEventArgs e )
-		{
+        private void _Save_Click( object sender, RoutedEventArgs e )
+        {
             // Password Safety Warning
             if( _Model.EnableAuth && _Model.Username.Length > 0 && Password.Password.Length > 0 )
             {
@@ -111,17 +111,17 @@ namespace PingerTool.Windows
             // Close Window
             _Window.Proj?.TriggerSaveStatus();
             Close();
-		}
+        }
 
-		/// <summary>
-		/// Event handler for clicking the Discard Button
-		/// </summary>
-		private void _Discard_Click( object sender, RoutedEventArgs e )
-		{
-			Close();
-		}
-		#endregion Window Events
-	}
+        /// <summary>
+        /// Event handler for clicking the Discard Button
+        /// </summary>
+        private void _Discard_Click( object sender, RoutedEventArgs e )
+        {
+            Close();
+        }
+        #endregion Window Events
+    }
 
     class SettingsModel : ViewModel
     {

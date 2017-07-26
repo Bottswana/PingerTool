@@ -24,33 +24,33 @@ namespace PingerTool.Windows
         public WebServer Server;
         public Log Log;
 
-		#region Initialiser
-		public MainWindow()
-		{
-			InitializeComponent();
+        #region Initialiser
+        public MainWindow()
+        {
+            InitializeComponent();
 
             // Setup Local Properties
             _Model = (MainWindowModel)DataContext;
-			Proj = new ProjectControl(this);
-			Log = new Log("Main GUI");
-			_AppRef = App.GetApp();
+            Proj = new ProjectControl(this);
+            Log = new Log("Main GUI");
+            _AppRef = App.GetApp();
 
-			// Use Fontawesome icons for ribbon
-			var ColourBrush = (SolidColorBrush)(new BrushConverter().ConvertFrom("#2b579a"));
-            Add.LargeIcon		= ImageAwesome.CreateImageSource(FontAwesomeIcon.PlusSquare, ColourBrush);
+            // Use Fontawesome icons for ribbon
+            var ColourBrush = (SolidColorBrush)(new BrushConverter().ConvertFrom("#2b579a"));
+            Add.LargeIcon       = ImageAwesome.CreateImageSource(FontAwesomeIcon.PlusSquare, ColourBrush);
             PauseAll.LargeIcon  = ImageAwesome.CreateImageSource(FontAwesomeIcon.Pause, ColourBrush);
             ResumeAll.LargeIcon = ImageAwesome.CreateImageSource(FontAwesomeIcon.Play, ColourBrush);
-            Settings.LargeIcon	= ImageAwesome.CreateImageSource(FontAwesomeIcon.Cogs, ColourBrush);
+            Settings.LargeIcon  = ImageAwesome.CreateImageSource(FontAwesomeIcon.Cogs, ColourBrush);
 
-			// Version Info
-			_Model.CompiledOn = Helpers.GetLinkerTime().ToString();
-			#if DEBUG
-			_Model.VersionString = string.Format("{0} - Development Build", Helpers.GetApplicationVersion());
-			#else
-			Model.VersionString = string.Format("{0} - Production Build", Helpers.GetApplicationVersion());
-			#endif
+            // Version Info
+            _Model.CompiledOn = Helpers.GetLinkerTime().ToString();
+            #if DEBUG
+            _Model.VersionString = string.Format("{0} - Development Build", Helpers.GetApplicationVersion());
+            #else
+            Model.VersionString = string.Format("{0} - Production Build", Helpers.GetApplicationVersion());
+            #endif
         }
-		#endregion Initialiser
+        #endregion Initialiser
 
         #region Window Events
         /// <summary>
@@ -65,125 +65,125 @@ namespace PingerTool.Windows
             }
         }
 
-		/// <summary>
-		/// Event hander for Ctrl + s Keyboard Combo
-		/// </summary>
-		private void _Window_PreviewKeyDown(object sender, KeyEventArgs e)
-		{
-			if( e.Key == Key.S && e.KeyboardDevice.Modifiers == ModifierKeys.Control )
-			{
-				// Save Combination
-				Proj.SaveProject(Proj.sCurrentFile);
-				return;
-			}
-		}
+        /// <summary>
+        /// Event hander for Ctrl + s Keyboard Combo
+        /// </summary>
+        private void _Window_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if( e.Key == Key.S && e.KeyboardDevice.Modifiers == ModifierKeys.Control )
+            {
+                // Save Combination
+                Proj.SaveProject(Proj.sCurrentFile);
+                return;
+            }
+        }
 
-		/// <summary>
-		/// Event handler for opening a new project
-		/// </summary>
-		private void _NewProject_Click( object sender, RoutedEventArgs e )
-		{
-			if( !Proj.SaveNeeded || MessageBox.Show("Are you sure you wish to create a new Project?\nAll unsaved work will be lost.", "New Project", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes )
-			{
-				// Create New Project
-				Proj.NewProject();
+        /// <summary>
+        /// Event handler for opening a new project
+        /// </summary>
+        private void _NewProject_Click( object sender, RoutedEventArgs e )
+        {
+            if( !Proj.SaveNeeded || MessageBox.Show("Are you sure you wish to create a new Project?\nAll unsaved work will be lost.", "New Project", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes )
+            {
+                // Create New Project
+                Proj.NewProject();
 
-				// Close Ribbon Menu
-				var Backstage = (Fluent.Backstage)ribbon.Menu;
-				if( Backstage != null ) Backstage.IsOpen = false;
-			}
-		}
+                // Close Ribbon Menu
+                var Backstage = (Fluent.Backstage)ribbon.Menu;
+                if( Backstage != null ) Backstage.IsOpen = false;
+            }
+        }
 
-		/// <summary>
-		/// Event handler for opening a project
-		/// </summary>
-		private void _OpenProject_Click( object sender, RoutedEventArgs e )
-		{
-			if( !Proj.SaveNeeded || MessageBox.Show("Are you sure you wish to open a project?\nAll unsaved work will be lost.", "Open Project", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes )
-			{
-				var FileDialog = new OpenFileDialog()
-				{
-				    Filter			= "Project Files (*.pingtool)|*.pingtool",
-				    Title			= "Save Project As",
-				    DefaultExt		= ".pingtool",
-					CheckPathExists = true,
-					ValidateNames	= true,
-					AddExtension	= true
-				};
+        /// <summary>
+        /// Event handler for opening a project
+        /// </summary>
+        private void _OpenProject_Click( object sender, RoutedEventArgs e )
+        {
+            if( !Proj.SaveNeeded || MessageBox.Show("Are you sure you wish to open a project?\nAll unsaved work will be lost.", "Open Project", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes )
+            {
+                var FileDialog = new OpenFileDialog()
+                {
+                    Filter          = "Project Files (*.pingtool)|*.pingtool",
+                    Title           = "Save Project As",
+                    DefaultExt      = ".pingtool",
+                    CheckPathExists = true,
+                    ValidateNames   = true,
+                    AddExtension    = true
+                };
 
-				if( FileDialog.ShowDialog() == true )
-				{
-					if( !Proj.OpenProject(FileDialog.FileName) )
-					{
-						// Open Error
-						MessageBox.Show("Unable to open project. It may be corrupt or the file selected may not be a valid project file.", "Open Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-					}
-					else
-					{
-						// Close Ribbon Menu
-						var Backstage = (Fluent.Backstage)ribbon.Menu;
-						if( Backstage != null ) Backstage.IsOpen = false;
-					}
-				}
-			}
-		}
+                if( FileDialog.ShowDialog() == true )
+                {
+                    if( !Proj.OpenProject(FileDialog.FileName) )
+                    {
+                        // Open Error
+                        MessageBox.Show("Unable to open project. It may be corrupt or the file selected may not be a valid project file.", "Open Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    }
+                    else
+                    {
+                        // Close Ribbon Menu
+                        var Backstage = (Fluent.Backstage)ribbon.Menu;
+                        if( Backstage != null ) Backstage.IsOpen = false;
+                    }
+                }
+            }
+        }
 
-		/// <summary>
-		/// Event hander for saving a project
-		/// </summary>
-		private void _SaveProject_Click( object sender, RoutedEventArgs e )
-		{
-			if( Proj.sCurrentFile == null )
-			{
-				// Open file is untitled, so open save as box
-				_SaveAsProject_Click(sender, e);
-				return;
-			}
+        /// <summary>
+        /// Event hander for saving a project
+        /// </summary>
+        private void _SaveProject_Click( object sender, RoutedEventArgs e )
+        {
+            if( Proj.sCurrentFile == null )
+            {
+                // Open file is untitled, so open save as box
+                _SaveAsProject_Click(sender, e);
+                return;
+            }
 
-			if( !Proj.SaveProject(Proj.sCurrentFile) )
-			{
-				// Save Error
-				MessageBox.Show("A save error has occoured, please check you have permission to save to this location.", "Save Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-			}
-			else
-			{
-				// Close Ribbon Menu
-				var Backstage = (Fluent.Backstage)ribbon.Menu;
-				if( Backstage != null ) Backstage.IsOpen = false;
-			}
-		}
+            if( !Proj.SaveProject(Proj.sCurrentFile) )
+            {
+                // Save Error
+                MessageBox.Show("A save error has occoured, please check you have permission to save to this location.", "Save Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            else
+            {
+                // Close Ribbon Menu
+                var Backstage = (Fluent.Backstage)ribbon.Menu;
+                if( Backstage != null ) Backstage.IsOpen = false;
+            }
+        }
 
-		/// <summary>
-		/// Event handler for saving a project with filename
-		/// </summary>
-		private void _SaveAsProject_Click( object sender, RoutedEventArgs e )
-		{
-			var FileDialog = new SaveFileDialog()
-			{
-				Filter			= "Project Files (*.pingtool)|*.pingtool",
-				Title			= "Save Project As",
-				DefaultExt		= ".pingtool",
-				CheckPathExists = true,
-				OverwritePrompt = true,
-				ValidateNames	= true,
-				AddExtension	= true
-			};
+        /// <summary>
+        /// Event handler for saving a project with filename
+        /// </summary>
+        private void _SaveAsProject_Click( object sender, RoutedEventArgs e )
+        {
+            var FileDialog = new SaveFileDialog()
+            {
+                Filter          = "Project Files (*.pingtool)|*.pingtool",
+                Title           = "Save Project As",
+                DefaultExt      = ".pingtool",
+                CheckPathExists = true,
+                OverwritePrompt = true,
+                ValidateNames   = true,
+                AddExtension    = true
+            };
 
-			if( FileDialog.ShowDialog() == true )
-			{
-				if( !Proj.SaveProject(FileDialog.FileName) )
-				{
-					// Save Error
-					MessageBox.Show("A save error has occoured, please check you have permission to save to this location.", "Save Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-				}
-				else
-				{
-					// Close Ribbon Menu
-					var Backstage = (Fluent.Backstage)ribbon.Menu;
-					if( Backstage != null ) Backstage.IsOpen = false;
-				}
-			}
-		}
+            if( FileDialog.ShowDialog() == true )
+            {
+                if( !Proj.SaveProject(FileDialog.FileName) )
+                {
+                    // Save Error
+                    MessageBox.Show("A save error has occoured, please check you have permission to save to this location.", "Save Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+                else
+                {
+                    // Close Ribbon Menu
+                    var Backstage = (Fluent.Backstage)ribbon.Menu;
+                    if( Backstage != null ) Backstage.IsOpen = false;
+                }
+            }
+        }
 
         /// <summary>
         /// Event handler for clicking the Add Button
@@ -378,9 +378,9 @@ namespace PingerTool.Windows
         }
         #endregion Initialiser
 
-		#region Private Properties
-		private string _VersionString;
-		private string _CompiledOn;
+        #region Private Properties
+        private string _VersionString;
+        private string _CompiledOn;
         private int _Columns = 1;
         #endregion Private Properties
 

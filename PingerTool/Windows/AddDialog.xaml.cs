@@ -5,20 +5,20 @@ using PingerTool.Classes;
 
 namespace PingerTool.Windows
 {
-	public partial class AddDialog
-	{
+    public partial class AddDialog
+    {
         private bool _EditMode = false;
         private AddDialogModel _Model;
-		private MainWindow _Window;
+        private MainWindow _Window;
         private IPAddress _OrigIP;
 
         #region Initialiser
-		public AddDialog(MainWindow Window, IPAddress Address = null, string DisplayName = null)
-		{
+        public AddDialog(MainWindow Window, IPAddress Address = null, string DisplayName = null)
+        {
             InitializeComponent();
 
             _Model = (AddDialogModel)DataContext;
-			_Window = Window;
+            _Window = Window;
 
             // Populate info if in edit mode
             if( Address != null && DisplayName != null )
@@ -28,17 +28,17 @@ namespace PingerTool.Windows
                 _OrigIP = Address;
                 _EditMode = true;
             }
-		}
+        }
         #endregion Initialiser
 
-		#region Window Events
+        #region Window Events
         /// <summary>
         /// Event handler for clicking the Save Button
         /// </summary>
-		private void _Save_Click(object sender, RoutedEventArgs e)
-		{
-			if( _Model.DisplayName.Length > 0 && _Model.IPAddress.Length > 0 )
-			{
+        private void _Save_Click(object sender, RoutedEventArgs e)
+        {
+            if( _Model.DisplayName.Length > 0 && _Model.IPAddress.Length > 0 )
+            {
                 // We need to convert the text IP to the IPAddress class.
                 if( IPAddress.TryParse(_Model.IPAddress, out IPAddress ParsedAddress) )
                 {
@@ -71,18 +71,18 @@ namespace PingerTool.Windows
                     // Invalid IP
                     MessageBox.Show("The IP Address you entered is invalid", "Whoops", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
-			}
-		}
+            }
+        }
 
-		/// <summary>
-		/// Event handler for clicking the Discard Button
-		/// </summary>
-		private void _Discard_Click(object sender, RoutedEventArgs e)
-		{
-			Close();
-		}
-		#endregion Window Events
-	}
+        /// <summary>
+        /// Event handler for clicking the Discard Button
+        /// </summary>
+        private void _Discard_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
+        #endregion Window Events
+    }
 
     class AddDialogModel : ViewModel
     {

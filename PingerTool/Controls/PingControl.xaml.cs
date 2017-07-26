@@ -154,26 +154,26 @@ namespace PingerTool.Controls
         /// <summary>
         /// Event for Unloading Control
         /// </summary>
-		private void _UserControl_Unloaded(object sender, RoutedEventArgs e)
-		{
-			_AppRef.Log.Debug("PingControl is being disposed");
-			Dispose();
-		}
+        private void _UserControl_Unloaded(object sender, RoutedEventArgs e)
+        {
+            _AppRef.Log.Debug("PingControl is being disposed");
+            Dispose();
+        }
 
         /// <summary>
         /// Event for Pause Button
         /// </summary>
-		private void _Pause_Click(object sender, RoutedEventArgs e)
-		{
+        private void _Pause_Click(object sender, RoutedEventArgs e)
+        {
             if( _Timer.Enabled ) PauseControl();
             else ResumeControl();
-		}
+        }
 
         /// <summary>
         /// Event for Edit Button
         /// </summary>
-		private void _Edit_Click(object sender, RoutedEventArgs e)
-		{
+        private void _Edit_Click(object sender, RoutedEventArgs e)
+        {
             var ResolveWindow = (MainWindow)_AppRef?.MainWindow;
             if( ResolveWindow != null )
             {
@@ -181,13 +181,13 @@ namespace PingerTool.Controls
                     AddDialog.Owner = ResolveWindow;
                     AddDialog.ShowDialog();
             }
-		}
+        }
 
         /// <summary>
         /// Event for Delete Button
         /// </summary>
-		private void _Delete_Click(object sender, RoutedEventArgs e)
-		{
+        private void _Delete_Click(object sender, RoutedEventArgs e)
+        {
             if( MessageBox.Show($"Are you sure you wish to delete this check?\n{_Model.DisplayName}", "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes )
             {
                 var ResolveWindow = (MainWindow)_AppRef?.MainWindow;
@@ -196,7 +196,7 @@ namespace PingerTool.Controls
                     ResolveWindow.RemovePingElement(_Model.Address);
                 }
             }
-		}
+        }
         #endregion Window Events
 
         #region Public Methods

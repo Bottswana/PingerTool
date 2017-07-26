@@ -6,11 +6,11 @@ using System.ComponentModel.Composition;
 namespace PingerTool.WebClasses
 {
     [Export(typeof(NancyModule))]
-	public class WebIndex : WebModule
-	{
+    public class WebIndex : WebModule
+    {
         #region Initialisation
-		public WebIndex()
-		{   
+        public WebIndex()
+        {   
             Get["/"] = IndexFunction;
         }
         #endregion Initialisation
@@ -25,5 +25,5 @@ namespace PingerTool.WebClasses
             return View["Index.html"];
         }
         #endregion Webserver Routes
-	}
+    }
 }

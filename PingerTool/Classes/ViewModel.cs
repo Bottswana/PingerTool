@@ -4,18 +4,18 @@ using System.Runtime.CompilerServices;
 
 namespace PingerTool.Classes
 {
-	public abstract class ViewModel : INotifyPropertyChanged, ICloneable
-	{
-		public event PropertyChangedEventHandler PropertyChanged;
+    public abstract class ViewModel : INotifyPropertyChanged, ICloneable
+    {
+        public event PropertyChangedEventHandler PropertyChanged;
 
         protected void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
-			PropertyChanged?.Invoke(this,new PropertyChangedEventArgs(propertyName));
+            PropertyChanged?.Invoke(this,new PropertyChangedEventArgs(propertyName));
         }
 
-		public object Clone()
-		{
-			return this.MemberwiseClone();
-		}
-	}
+        public object Clone()
+        {
+            return this.MemberwiseClone();
+        }
+    }
 }

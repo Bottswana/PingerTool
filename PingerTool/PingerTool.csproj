@@ -115,7 +115,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Classes\AutoScrollTextbox.cs" />
+    <Compile Include="Classes\ThirdParty\AutoScrollTextbox.cs" />
     <Compile Include="Classes\Log.cs" />
     <Compile Include="Classes\ProjectControl.cs" />
     <Compile Include="Classes\ThirdParty\EmbeddedStaticContentConverstionBuilder.cs" />

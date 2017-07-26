@@ -8,120 +8,120 @@ using log4net.Repository.Hierarchy;
 
 namespace PingerTool.Classes
 {
-	public class Log
-	{
-		private ILog Logger;
+    public class Log
+    {
+        private ILog Logger;
 
         #region Initialiser
-		public Log(string LogName)
-		{
-			Logger = LogManager.GetLogger(LogName);
-		}
+        public Log(string LogName)
+        {
+            Logger = LogManager.GetLogger(LogName);
+        }
         #endregion Initialiser
 
-		#region Public Methods
-		public void Debug(string formatString, params object[] paramList)
-		{
-			Logger.Debug(string.Format(formatString, paramList));
-		}
+        #region Public Methods
+        public void Debug(string formatString, params object[] paramList)
+        {
+            Logger.Debug(string.Format(formatString, paramList));
+        }
 
-		public void Debug(Exception Ex, string formatString, params object[] paramList)
-		{
-			Logger.Debug(string.Format(formatString, paramList), Ex);
-		}
+        public void Debug(Exception Ex, string formatString, params object[] paramList)
+        {
+            Logger.Debug(string.Format(formatString, paramList), Ex);
+        }
 
-		public void Info(string formatString, params object[] paramList)
-		{
-			Logger.Info(string.Format(formatString, paramList));
-		}
+        public void Info(string formatString, params object[] paramList)
+        {
+            Logger.Info(string.Format(formatString, paramList));
+        }
 
-		public void Info(Exception Ex, string formatString, params object[] paramList)
-		{
-			Logger.Info(string.Format(formatString, paramList), Ex);
-		}
+        public void Info(Exception Ex, string formatString, params object[] paramList)
+        {
+            Logger.Info(string.Format(formatString, paramList), Ex);
+        }
 
-		public void Warn(string formatString, params object[] paramList)
-		{
-			Logger.Warn(string.Format(formatString, paramList));
-		}
+        public void Warn(string formatString, params object[] paramList)
+        {
+            Logger.Warn(string.Format(formatString, paramList));
+        }
 
-		public void Warn(Exception Ex, string formatString, params object[] paramList)
-		{
-			Logger.Warn(string.Format(formatString, paramList), Ex);
-		}
+        public void Warn(Exception Ex, string formatString, params object[] paramList)
+        {
+            Logger.Warn(string.Format(formatString, paramList), Ex);
+        }
 
-		public void Error(string formatString, params object[] paramList)
-		{
-			Logger.Error(string.Format(formatString, paramList));
-		}
+        public void Error(string formatString, params object[] paramList)
+        {
+            Logger.Error(string.Format(formatString, paramList));
+        }
 
-		public void Error(Exception Ex, string formatString, params object[] paramList)
-		{
-			Logger.Error(string.Format(formatString, paramList), Ex);
-		}
+        public void Error(Exception Ex, string formatString, params object[] paramList)
+        {
+            Logger.Error(string.Format(formatString, paramList), Ex);
+        }
 
-		public void Fatal(string formatString, params object[] paramList)
-		{
-			Logger.Fatal(string.Format(formatString, paramList));
-		}
+        public void Fatal(string formatString, params object[] paramList)
+        {
+            Logger.Fatal(string.Format(formatString, paramList));
+        }
 
-		public void Fatal(Exception Ex, string formatString, params object[] paramList)
-		{
-			Logger.Fatal(string.Format(formatString, paramList), Ex);
-		}
-		#endregion Public Methods
-	}
+        public void Fatal(Exception Ex, string formatString, params object[] paramList)
+        {
+            Logger.Fatal(string.Format(formatString, paramList), Ex);
+        }
+        #endregion Public Methods
+    }
 
-	class LogInitiator
-	{
+    class LogInitiator
+    {
         #region Log Configurator
-		public static void ConfigureLog(string LogFileName, string LogLevel)
-		{
-			// Generic Configuration
-			Hierarchy hierarchy = (Hierarchy)LogManager.GetRepository();
-			hierarchy.Root.RemoveAllAppenders();
+        public static void ConfigureLog(string LogFileName, string LogLevel)
+        {
+            // Generic Configuration
+            Hierarchy hierarchy = (Hierarchy)LogManager.GetRepository();
+            hierarchy.Root.RemoveAllAppenders();
 
-			var PatternLayout = new PatternLayout()
-			{
-				ConversionPattern = "%date{dd MMM yyyy HH:mm:ss} [%-10c] %-5p:	%m%n"
-			};
+            var PatternLayout = new PatternLayout()
+            {
+                ConversionPattern = "%date{dd MMM yyyy HH:mm:ss} [%-10c] %-5p:  %m%n"
+            };
 
-			// Get Logging Level
-			var LoggingLevel = hierarchy.LevelMap[LogLevel];
-			if( LoggingLevel == null )
-			{
-				LoggingLevel = Level.All;
-			}
+            // Get Logging Level
+            var LoggingLevel = hierarchy.LevelMap[LogLevel];
+            if( LoggingLevel == null )
+            {
+                LoggingLevel = Level.All;
+            }
 
-			// Configure Event Log
-			var EventLog = new EventLogAppender()
-			{
-				ApplicationName = "PingerTool",
-				Layout			= PatternLayout,
-				Threshold		= Level.Warn
-			};
+            // Configure Event Log
+            var EventLog = new EventLogAppender()
+            {
+                ApplicationName = "PingerTool",
+                Layout          = PatternLayout,
+                Threshold       = Level.Warn
+            };
 
-			// Configure File Log
-			var LogFile = new FileAppender()
-			{
-				File			= LogFileName,
-				LockingModel	= new FileAppender.MinimalLock(),
-				Layout			= PatternLayout,
-				#if DEBUG
-				Threshold		= Level.Debug,
-				#else
-				Threshold		= LoggingLevel,
-				#endif
-				AppendToFile	= true
-			};
+            // Configure File Log
+            var LogFile = new FileAppender()
+            {
+                File            = LogFileName,
+                LockingModel    = new FileAppender.MinimalLock(),
+                Layout          = PatternLayout,
+                #if DEBUG
+                Threshold       = Level.Debug,
+                #else
+                Threshold       = LoggingLevel,
+                #endif
+                AppendToFile    = true
+            };
 
-			// Activate Logging
-			PatternLayout.ActivateOptions();
-			EventLog.ActivateOptions();
-			LogFile.ActivateOptions();
+            // Activate Logging
+            PatternLayout.ActivateOptions();
+            EventLog.ActivateOptions();
+            LogFile.ActivateOptions();
 
-			BasicConfigurator.Configure(new IAppender[] { EventLog, LogFile });
-		}
+            BasicConfigurator.Configure(new IAppender[] { EventLog, LogFile });
+        }
         #endregion Log Configurator
-	}
+    }
 }
