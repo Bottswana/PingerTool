@@ -3,15 +3,23 @@ using Nancy;
 using Nancy.TinyIoc;
 using Nancy.Security;
 using System.Windows;
-using Nancy.ViewEngines;
 using Nancy.Conventions;
 using Nancy.Hosting.Self;
 using Nancy.Bootstrapper;
 using PingerTool.Windows;
 using LukeSkywalker.IPNetwork;
-using Nancy.Embedded.Conventions;
 using Nancy.Authentication.Basic;
 using System.Collections.Generic;
+
+/*
+ * Note: Using compiler statements to use embedded views when compiled with release build
+ * RELEASE BUILDS WILL REQUIRE THE HTML VIEWS BE EMBEDDED AS RESOURCES
+ */
+
+#if !DEBUG
+using Nancy.ViewEngines;
+using Nancy.Embedded.Conventions;
+#endif
 
 namespace PingerTool.Classes
 {
@@ -21,7 +29,6 @@ namespace PingerTool.Classes
         public readonly string[] AuthDetails = {"", ""};
         public readonly string BindAddress = "";
         public readonly bool AuthEnabled = false;
-        public readonly bool UseEmbedded = false;
 
         private bool _DisposedValue = false;
         private NancyHost _Server;
@@ -167,22 +174,19 @@ namespace PingerTool.Classes
             var MWindow = (MainWindow)App.GetApp()?.MainWindow;
             if( MWindow != null && MWindow.Server != null )
             {
-                if( MWindow.Server.UseEmbedded )
-			    {
-				    // Use embedded static resources
-				    foreach( var Dir in StaticDirectories )
-				    {
-					    nancyConventions.StaticContentsConventions.Add(EmbeddedStaticContentConventionBuilder.AddDirectory(Dir, GetType().Assembly, Dir));
-				    }
-			    }
-			    else
-			    {
-				    // Use static resources on filesystem
-				    foreach( var Dir in StaticDirectories )
-				    {
-					    nancyConventions.StaticContentsConventions.Add(StaticContentConventionBuilder.AddDirectory(Dir));
-				    }
-			    }
+                #if !DEBUG
+				// Use embedded static resources
+				foreach( var Dir in StaticDirectories )
+				{
+					nancyConventions.StaticContentsConventions.Add(EmbeddedStaticContentConventionBuilder.AddDirectory(Dir, GetType().Assembly, Dir));
+				}
+                #else
+				// Use static resources on filesystem
+				foreach( var Dir in StaticDirectories )
+				{
+					nancyConventions.StaticContentsConventions.Add(StaticContentConventionBuilder.AddDirectory(Dir));
+				}
+                #endif
             }
 		}
 
@@ -205,14 +209,13 @@ namespace PingerTool.Classes
 
 		void OnConfigurationBuilder( NancyInternalConfiguration x )
 		{
+            #if !DEBUG
             var MWindow = (MainWindow)App.GetApp()?.MainWindow;
             if( MWindow != null && MWindow.Server != null )
             {
-			    if( MWindow.Server.UseEmbedded )
-			    {
-				    x.ViewLocationProvider = typeof(ResourceViewLocationProvider);
-			    }
+				x.ViewLocationProvider = typeof(ResourceViewLocationProvider);
             }
+            #endif
 		}
 		#endregion Override for Embedded Views
     }
