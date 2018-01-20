@@ -1,8 +1,10 @@
 ﻿<UserControl x:Class="PingerTool.Controls.PingControl"
+             xmlns:d3="clr-namespace:InteractiveDataDisplay.WPF;assembly=InteractiveDataDisplay.WPF"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:Converters="clr-namespace:PingerTool.Converters"
              xmlns:classes="clr-namespace:PingerTool.Classes"
              xmlns:fa="http://schemas.fontawesome.io/icons/"
              xmlns:local="clr-namespace:PingerTool.Controls"
@@ -15,51 +17,111 @@
         <!-- Using d prefix so model is bound in designer only. Actual DataContext is bound by ItemsControl in MainWindow.xaml -->
         <local:PingControlModel />
     </d:UserControl.DataContext>
-    
+    <UserControl.Resources>
+        <!-- Converters -->
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <Converters:CollectionToTextConverter x:Key="TextConverter"/>
+
+        <!-- Custom Chart Style -->
+        <Style TargetType="d3:Chart">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="d3:Chart">
+                        <Grid>
+                            <d3:Figure x:Name="PART_figure"
+                                   PlotHeight="{Binding PlotHeight, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                   PlotWidth="{Binding PlotWidth, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                   Background="{TemplateBinding Background}"
+                                   IsAutoFitEnabled="False"
+                                   AspectRatio="0">
+                                <ContentPresenter />
+                            </d3:Figure>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
     <Grid Background="White">
         <Grid.RowDefinitions>
             <RowDefinition Height="70"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
         <!-- Upper Container -->
         <Grid Grid.Row="0">
-            <fa:FontAwesome Icon="Circle" Foreground="{Binding Colour}" FontSize="18" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="12,12,0,0" />
-            <Label HorizontalAlignment="Left" Margin="35,2,0,0" VerticalAlignment="Top" FontSize="19" FontFamily="Segoe UI Light">
-                <Label.Content>
-                    <TextBlock>
-                        <TextBlock.Text>
-                            <MultiBinding StringFormat="{}{0} ({1})">
-                                <Binding Path="DisplayName" />
-                                <Binding Path="Address" />
-                            </MultiBinding>
-                        </TextBlock.Text>
-                    </TextBlock>
-                </Label.Content>
-            </Label>
-            <Label ContentStringFormat="Last Contact: {0}" Content="{Binding LastContact}" HorizontalAlignment="Left" Margin="8,35,0,0" VerticalAlignment="Top" FontSize="14" FontFamily="Segoe UI Light"/>
+            <fa:ImageAwesome Icon="Circle" Foreground="{Binding Colour}" Width="18" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="12,13,0,0" />
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
 
-            <Button Click="_Pause_Click" Width="20" Height="20" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="66,10" BorderBrush="LightGray">
-                <Button.Content>
-                    <fa:FontAwesome x:Name="Test" Icon="{Binding PauseIcon}" Foreground="Black" FontSize="10" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="-2" />
-                </Button.Content>
-            </Button>
+                <Label Grid.Column="0" HorizontalAlignment="Left" Margin="35,3,0,0" VerticalAlignment="Top" FontSize="19" FontFamily="Segoe UI Light">
+                    <Label.Content>
+                        <TextBlock>
+                            <TextBlock.Text>
+                                <MultiBinding StringFormat="{}{0} ({1})">
+                                    <Binding Path="DisplayName" />
+                                    <Binding Path="Address" />
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
+                    </Label.Content>
+                </Label>
+                <fa:ImageAwesome Visibility="{Binding Alerting, Converter={StaticResource BooleanToVisibilityConverter}}" Grid.Column="1" Icon="VolumeUp" Width="20" Foreground="Gray" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,13,0,0" />
+            </Grid>
 
-            <Button Click="_Edit_Click" Width="20" Height="20" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="38,10" BorderBrush="LightGray">
-                <Button.Content>
-                    <fa:FontAwesome Icon="Pencil" Foreground="Black" FontSize="10" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="-2" />
-                </Button.Content>
-            </Button>
+            <Label Grid.Column="0" ContentStringFormat="Last Contact: {0}" Content="{Binding LastContact}" HorizontalAlignment="Left" Margin="8,35,0,0" VerticalAlignment="Top" FontSize="14" FontFamily="Segoe UI Light"/>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="40"/>
+                </Grid.RowDefinitions>
 
-            <Button Click="_Delete_Click" Width="20" Height="20" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10" BorderBrush="LightGray">
-                <Button.Content>
-                    <fa:FontAwesome Icon="Trash" Foreground="Black" FontSize="10" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="-2" />
-                </Button.Content>
-            </Button>
+                <!-- Top Row -->
+                <Button Grid.Row="0" Click="_Pause_Click" Width="20" Height="20" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="66,10" BorderBrush="LightGray">
+                    <Button.Content>
+                        <fa:FontAwesome Icon="{Binding PauseIcon}" Foreground="Black" FontSize="10" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="-2" />
+                    </Button.Content>
+                </Button>
+
+                <Button Grid.Row="0" Click="_Edit_Click" Width="20" Height="20" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="38,10" BorderBrush="LightGray">
+                    <Button.Content>
+                        <fa:FontAwesome Icon="Pencil" Foreground="Black" FontSize="10" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="-2" />
+                    </Button.Content>
+                </Button>
+
+                <Button Grid.Row="0" Click="_Delete_Click" Width="20" Height="20" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10" BorderBrush="LightGray">
+                    <Button.Content>
+                        <fa:FontAwesome Icon="Trash" Foreground="Black" FontSize="10" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="-2" />
+                    </Button.Content>
+                </Button>
+                
+                <!-- Bottom Row -->
+                <Button Grid.Row="1" Click="_Graph_Click" Width="34" Height="20" HorizontalAlignment="Right" VerticalAlignment="Top" BorderBrush="LightGray" Margin="10,0">
+                    <Button.Content>
+                        <fa:FontAwesome Icon="BarChart" Foreground="Black" FontSize="10" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="-2" />
+                    </Button.Content>
+                </Button>
+            </Grid>
         </Grid>
+        
+        <!-- Graph Container -->
+        <d3:Chart x:Name="GraphHost" Grid.Row="1" Visibility="{Binding ShowGraph, Converter={StaticResource BooleanToVisibilityConverter}}" Background="LightGray" HorizontalAlignment="Stretch" Height="100" PlotHeight="{Binding Window.GraphHeight}" PlotWidth="{Binding Width}">
+            <d3:BarGraph x:Name="GraphTarget" StrokeThickness="1" Stroke="LightGray" BarsWidth="1" Color="DarkGreen" />
+        </d3:Chart>
 
         <!-- Ping Container -->
-        <TextBox Grid.Row="1" Background="{Binding Colour}" Foreground="White" FontSize="12" FontFamily="Consolas" Padding="2" IsReadOnly="True" Text="{Binding DisplayContents}" classes:TextBoxUtilities.AlwaysScrollToEnd="True" />
-
+        <TextBox Grid.Row="2" Background="{Binding Colour}" Foreground="White" FontSize="12" FontFamily="Consolas" Padding="2" IsReadOnly="True" classes:TextBoxUtilities.AlwaysScrollToEnd="True">
+            <TextBox.Text>
+                <MultiBinding Converter="{StaticResource TextConverter}">
+                    <Binding Path="DisplayLines" Mode="OneWay"/>
+                    <Binding Path="DisplayLines.Count" Mode="OneWay"/><!-- Only needed for PropertyChanged updates -->
+                </MultiBinding>
+            </TextBox.Text>
+        </TextBox>
     </Grid>
 </UserControl>

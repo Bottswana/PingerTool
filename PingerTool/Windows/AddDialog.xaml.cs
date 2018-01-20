@@ -40,7 +40,8 @@ namespace PingerTool.Windows
             if( _Model.DisplayName.Length > 0 && _Model.IPAddress.Length > 0 )
             {
                 // We need to convert the text IP to the IPAddress class.
-                if( IPAddress.TryParse(_Model.IPAddress, out IPAddress ParsedAddress) )
+                var AddressString = ( _Model.IPAddress.Contains(",") ) ? _Model.IPAddress.Split(',')[1] : _Model.IPAddress;
+                if( IPAddress.TryParse(AddressString.Trim(), out IPAddress ParsedAddress) )
                 {
                     if( _EditMode )
                     {
@@ -72,14 +73,6 @@ namespace PingerTool.Windows
                     MessageBox.Show("The IP Address you entered is invalid", "Whoops", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
             }
-        }
-
-        /// <summary>
-        /// Event handler for clicking the Discard Button
-        /// </summary>
-        private void _Discard_Click(object sender, RoutedEventArgs e)
-        {
-            Close();
         }
         #endregion Window Events
     }

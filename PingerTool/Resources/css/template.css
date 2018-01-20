@@ -1,0 +1,171 @@
+﻿/*
+    PingerTool Web
+    Copyright (c) 2018 James Botting - james@bottswanamedia.info
+*/
+
+body {
+    font-family: "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    line-height: 1.42857143;
+    background-color: #ddd;
+    font-size: 15px;
+    color: #555;
+}
+
+.topnav {
+    border-bottom: 1px solid #eee;
+    background-color: #272727;
+    line-height: 58px;
+    min-height: 58px;
+    font-size: 19px;
+    padding: 0 20px;
+    color: #979797;
+    z-index: 100;
+    border: none;
+}
+
+.content {
+    padding: 20px;
+}
+
+.panel {
+    margin-top: -10px;
+    width: calc(33.33333333% - 10px);
+    border: 1px solid #aaa;
+    border-radius: 5px;
+    margin-left: 10px;
+    padding: 0;
+}
+
+.panel-body {
+    overflow: hidden;
+    height: 310px;
+    padding: 0;
+}
+
+.panel-body .info {
+    background-color: #eee;
+    padding: 10px;
+}
+
+.panel-heading {
+    border-top-right-radius: 5px;
+    border-top-left-radius: 5px;   
+}
+
+.panel-body .PingData {
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+    height: calc(100% - 40px);
+    background-color: #000;
+    font-size: 12px;
+    padding: 5px;
+    color: #fff;
+}
+
+.options {
+    float: right;
+}
+
+a .fa {
+    color: rgb(51, 122, 183);;
+}
+
+a, a:hover, a:visited, a:active {
+    text-decoration: none;
+    font-size: 14px;
+    color: #ccc;
+}
+
+.alert {
+    width:calc(100% - 145px);
+    padding: 10px 0 0 10px;
+    display: inline-block;
+    margin-left: 10px;
+    padding-top: 8px;
+    font-size: 13px;
+    height: 38px;
+}
+
+.Target{
+    margin: 30px 0 0 -10px;
+}
+
+
+
+
+
+/* Popup Box */
+.popupContainer, .popupContainerL, .popupContainerConfirm {
+    width: 300px;
+    height: 100px;
+
+    background-color: rgba(255,255,255, 0.95);
+    box-shadow: 0 0 20px rgba(50, 50, 50, 0.4);
+
+    position: fixed;
+    top: calc( 50% - 50px );
+    left: calc( 50% - 150px );
+
+    display: none;
+    z-index: 999;
+
+    opacity: 0;
+    transform: scale(0.6);
+}
+
+.popupContainer.Animate, .popupContainerL.Animate, .popupContainerConfirm.Animate {
+    transition: all 0.1s ease-in-out;
+}
+
+.popupContainer.Display, .popupContainerL.Display, .popupContainerConfirm.Display {
+    opacity: 1 !important;
+    transform: scale(1) !important;
+}
+
+.popupContainer button, .popupContainerL button, .popupContainerConfirm button  {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+}
+
+.popupContainerConfirm button.confirm {
+    right: 70px;
+}
+
+.popupContainer i, .popupContainerConfirm i {
+    padding: 20px 0 0 15px;
+    float: left;
+}
+
+.popupContainer .Contents, .popupContainerL .Contents, .popupContainerConfirm .Contents {
+    font-size: 12px;
+    color: #555;
+
+    padding: 13px 10px 10px 50px;
+}
+
+.popupOverlay {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+
+    width: 100%;
+    height: 100%;
+
+    background-color: rgba(50, 50, 50, 0.6);
+
+    display: none;
+    opacity: 0;
+}
+
+.popupOverlay.Animate {
+    transition: all 0.2s ease-in-out;
+}
+
+.popupOverlay.Display {
+    opacity: 1 !important;
+}
+
+.panel-primary .panel-heading {
+    background-image: linear-gradient(to bottom, #337ab7 0%, #2e6da4 100%) !important;
+}

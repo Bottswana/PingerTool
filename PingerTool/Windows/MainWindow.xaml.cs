@@ -1,28 +1,35 @@
 ﻿using System;
 using System.Net;
 using System.Linq;
+using System.Media;
+using System.Timers;
 using System.Windows;
 using Microsoft.Win32;
 using FontAwesome.WPF;
+using System.Reflection;
 using PingerTool.Classes;
 using PingerTool.Controls;
-using System.Windows.Data;
 using System.Windows.Media;
-using System.Globalization;
 using System.Windows.Input;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace PingerTool.Windows
 {
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, IDisposable
     {
-        private MainWindowModel _Model;
-        private App _AppRef;
-
+        public int[] Timeframes = { 2000, 2000, 0, 5 }; // UIWarn, UITImeout, SoundWarn, SoundTimeout
+        public bool Notification = false;
+        public MainWindowModel Model;
         public ProjectControl Proj;
+        public SoundPlayer Player;
         public WebServer Server;
-        public Log Log;
+        public Spark Spark;
+
+        private bool _IsTimerRunning = false;
+        private bool _IsPlayingAlert = false;
+        private bool _DisposedValue = false;
+        private Timer _Timer;
 
         #region Initialiser
         public MainWindow()
@@ -30,10 +37,16 @@ namespace PingerTool.Windows
             InitializeComponent();
 
             // Setup Local Properties
-            _Model = (MainWindowModel)DataContext;
+            Model = (MainWindowModel)DataContext;
             Proj = new ProjectControl(this);
-            Log = new Log("Main GUI");
-            _AppRef = App.GetApp();
+
+            // Setup Timer
+            _Timer = new Timer(500);
+            _Timer.Elapsed += _Timer_Elapsed;
+            _Timer.Start();
+
+            // Setup Player
+            Player = _SetupPlayer();
 
             // Use Fontawesome icons for ribbon
             var ColourBrush = (SolidColorBrush)(new BrushConverter().ConvertFrom("#2b579a"));
@@ -41,24 +54,107 @@ namespace PingerTool.Windows
             PauseAll.LargeIcon  = ImageAwesome.CreateImageSource(FontAwesomeIcon.Pause, ColourBrush);
             ResumeAll.LargeIcon = ImageAwesome.CreateImageSource(FontAwesomeIcon.Play, ColourBrush);
             Settings.LargeIcon  = ImageAwesome.CreateImageSource(FontAwesomeIcon.Cogs, ColourBrush);
+            ShGraph.LargeIcon   = ImageAwesome.CreateImageSource(FontAwesomeIcon.BarChart, ColourBrush);
+            NoGraph.LargeIcon   = ImageAwesome.CreateImageSource(FontAwesomeIcon.BarChart, Brushes.Gray);
 
             // Version Info
-            _Model.CompiledOn = Helpers.GetLinkerTime().ToString();
+            Model.CompiledOn = Helpers.GetLinkerTime().ToString();
             #if DEBUG
-            _Model.VersionString = string.Format("{0} - Development Build", Helpers.GetApplicationVersion());
+            Model.VersionString = string.Format("{0} - Development Build", Helpers.GetApplicationVersion());
             #else
             Model.VersionString = string.Format("{0} - Production Build", Helpers.GetApplicationVersion());
             #endif
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if( !_DisposedValue )
+            {
+                if( disposing )
+                {
+                    _Timer.Dispose();
+                }
+
+                _DisposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
         }
         #endregion Initialiser
 
         #region Window Events
         /// <summary>
+        /// Main Timer Callback
+        /// </summary>
+        private void _Timer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            if( _IsTimerRunning ) return;
+            _IsTimerRunning = true;
+
+            var NeedsToAlert = false;
+            foreach( var Control in Model.PingWindows )
+            {
+                // Update audio alerting status
+                if( Notification && ((Timeframes[2] > 0 && Control.WarningFailures >= Timeframes[2]) 
+                    || (Timeframes[3] > 0 && Control.TimeoutFailures >= Timeframes[3])) )
+                {
+                    NeedsToAlert = true;
+                    Control.Alerting = true;
+                    if( !_IsPlayingAlert )
+                    {
+                        _IsPlayingAlert = true;
+                        Player.PlayLooping();
+                    }
+                }
+                else
+                {
+                    Control.Alerting = false;
+                }
+
+                // Update Spark Status
+                if( Spark != null && ((Spark.WarningThreshold > 0 && Control.WarningFailures >= Spark.WarningThreshold) 
+                    || (Spark.TimeoutThreshold > 0 && Control.TimeoutFailures >= Spark.TimeoutThreshold)) )
+                {
+                    if( !Control.HasNotifiedBySpark )
+                    {
+                        Control.HasNotifiedBySpark = true;
+                        var Lines = Control.DisplayLines;
+
+                        var Status = ( Control.WarningFailures != 0 ) ? "HIGH RESPONSE TIME" : "TIMEOUT";
+                        var BaseMessage = $"Host '{Control.DisplayName}' has entered state '{Status}'.\n\nLast contact: '{Control.LastContact}'";
+                        var t = Spark.SendMessage($"ALERT: {BaseMessage}", $"**ALERT**: {BaseMessage}\n```\n{Lines[Lines.Count-4]}\n{Lines[Lines.Count-3]}\n{Lines[Lines.Count-2]}\n```");
+                    }
+                }
+                else if( Control.HasNotifiedBySpark )
+                {
+                    Control.HasNotifiedBySpark = false;
+                    var Lines = Control.DisplayLines;
+
+                    var BaseMessage = $"Host '{Control.DisplayName}' has cleared alert state.\n\nLast contact: '{Control.LastContact}'";
+                    var t = Spark.SendMessage($"OK: {BaseMessage}", $"**OK**: {BaseMessage}\n```\n{Lines[Lines.Count-4]}\n{Lines[Lines.Count-3]}\n{Lines[Lines.Count-2]}\n```");
+                }
+            }
+
+            // Stop Audio Alert
+            if( !NeedsToAlert && _IsPlayingAlert )
+            {
+                _IsPlayingAlert = false;
+                Player.Stop(); 
+            }
+
+            // End of timer
+            _IsTimerRunning = false;
+        }
+
+        /// <summary>
         /// Window Closing Event
         /// </summary>
-        private void _Window_Closing( object sender, System.ComponentModel.CancelEventArgs e )
+        private void _Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if( !_AppRef.ConfirmApplicationShutdown() && e != null )
+            if( !App.GetApp().ConfirmApplicationShutdown() && e != null )
             {
                 // Abort closing of window
                 e.Cancel = true;
@@ -81,7 +177,7 @@ namespace PingerTool.Windows
         /// <summary>
         /// Event handler for opening a new project
         /// </summary>
-        private void _NewProject_Click( object sender, RoutedEventArgs e )
+        private void _NewProject_Click(object sender, RoutedEventArgs e)
         {
             if( !Proj.SaveNeeded || MessageBox.Show("Are you sure you wish to create a new Project?\nAll unsaved work will be lost.", "New Project", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes )
             {
@@ -97,7 +193,7 @@ namespace PingerTool.Windows
         /// <summary>
         /// Event handler for opening a project
         /// </summary>
-        private void _OpenProject_Click( object sender, RoutedEventArgs e )
+        private void _OpenProject_Click(object sender, RoutedEventArgs e)
         {
             if( !Proj.SaveNeeded || MessageBox.Show("Are you sure you wish to open a project?\nAll unsaved work will be lost.", "Open Project", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes )
             {
@@ -131,7 +227,7 @@ namespace PingerTool.Windows
         /// <summary>
         /// Event hander for saving a project
         /// </summary>
-        private void _SaveProject_Click( object sender, RoutedEventArgs e )
+        private void _SaveProject_Click(object sender, RoutedEventArgs e)
         {
             if( Proj.sCurrentFile == null )
             {
@@ -156,7 +252,7 @@ namespace PingerTool.Windows
         /// <summary>
         /// Event handler for saving a project with filename
         /// </summary>
-        private void _SaveAsProject_Click( object sender, RoutedEventArgs e )
+        private void _SaveAsProject_Click(object sender, RoutedEventArgs e)
         {
             var FileDialog = new SaveFileDialog()
             {
@@ -188,27 +284,27 @@ namespace PingerTool.Windows
         /// <summary>
         /// Event handler for clicking the Add Button
         /// </summary>
-        private void _AddCheck_Click( object sender, RoutedEventArgs e )
+        private void _AddCheck_Click(object sender, RoutedEventArgs e)
         {
-            var AddDialog = new AddDialog(this);
-                AddDialog.Owner = this;
-                AddDialog.ShowDialog();
+            (new AddDialog(this) {
+                Owner = this
+            }).ShowDialog();
         }
 
         /// <summary>
         /// Event handler for clicking the Settings Button
         /// </summary>
-        private void _Settings_Click( object sender, RoutedEventArgs e )
+        private void _Settings_Click(object sender, RoutedEventArgs e)
         {
-            var Settings = new Settings(this);
-                Settings.Owner = this;
-                Settings.ShowDialog();
+            (new Settings(this) {
+                Owner = this
+            }).ShowDialog();
         }
 
         /// <summary>
         /// Event hander for clicking the pause all button
         /// </summary>
-        private void _PauseAll_Click( object sender, RoutedEventArgs e )
+        private void _PauseAll_Click(object sender, RoutedEventArgs e)
         {
             foreach( var PingControl in FindVisualChildren<PingControl>(this) )
             {
@@ -219,16 +315,49 @@ namespace PingerTool.Windows
         /// <summary>
         /// Event hander for clicking the resume all button
         /// </summary>
-        private void _ResumeAll_Click( object sender, RoutedEventArgs e )
+        private void _ResumeAll_Click(object sender, RoutedEventArgs e)
         {
             foreach( var PingControl in FindVisualChildren<PingControl>(this) )
             {
                 PingControl.ResumeControl();
             }
         }
+
+        /// <summary>
+        /// Event hander for clicking the graph button
+        /// </summary>
+        private void _GraphsOn_Click(object sender, RoutedEventArgs e)
+        {
+            foreach( var PingControl in Model.PingWindows )
+            {
+                PingControl.ShowGraph = true;
+            }
+        }
+
+        /// <summary>
+        /// Event hander for clicking the graph button
+        /// </summary>
+        private void _GraphsOff_Click(object sender, RoutedEventArgs e)
+        {
+            foreach( var PingControl in Model.PingWindows )
+            {
+                PingControl.ShowGraph = false;
+            }
+        }
         #endregion Window Events
 
         #region Private Methods
+        private SoundPlayer _SetupPlayer()
+        {
+            const string ResourceName = "PingerTool.Resources.AlertAudio.wav";
+            using( var Stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(ResourceName) )
+            {
+                var Player = new SoundPlayer(Stream);
+                Player.Load();
+                return Player;
+            }
+        }
+
         public static IEnumerable<T> FindVisualChildren<T>(DependencyObject depObj) where T : DependencyObject
         {
             if( depObj != null )
@@ -256,25 +385,27 @@ namespace PingerTool.Windows
         /// </summary>
         /// <param name="HeaderName">Name of the Element</param>
         /// <param name="Address">IP Address to Ping</param>
+        /// <param name="GraphHidden">If graph element is hidden</param>
         /// <returns>True if added, False if the element exists already</returns>
-        public bool CreatePingElement(string HeaderName, IPAddress Address)
+        public bool CreatePingElement(string HeaderName, IPAddress Address, bool GraphHidden = false)
         {
             // Check it does not already exist
-            var Elements = _Model.PingWindows.Count( q => { return q.Address.Equals(Address); });
+            var Elements = Model.PingWindows.Count( q => { return q.Address.Equals(Address); });
             if( Elements != 0 ) return false;
 
             // Add Model to Collection
-            _Model.PingWindows.Add(new PingControlModel()
+            Model.PingWindows.Add(new PingControlModel()
             {
+                ShowGraph = !GraphHidden,
                 DisplayName = HeaderName,
                 Address = Address
             });
 
             // Update Column Count
-            var TotalCount = _Model.PingWindows.Count;
-            if( TotalCount > 8 ) _Model.Columns = 3; // Three windows wide, we can fit about 12 on a 1080 screen before it gets silly
-            else if( TotalCount > 1 ) _Model.Columns = 2;
-            else _Model.Columns = 1;
+            var TotalCount = Model.PingWindows.Count;
+            if( TotalCount > 8 ) Model.Columns = 3; // Three windows wide, we can fit about 12 on a 1080 screen before it gets silly
+            else if( TotalCount > 1 ) Model.Columns = 2;
+            else Model.Columns = 1;
 
             Proj?.TriggerSaveStatus();
             return true;
@@ -288,18 +419,18 @@ namespace PingerTool.Windows
         public bool RemovePingElement(IPAddress Address)
         {
             // Check it exists
-            var Elements = _Model.PingWindows.Count(q => { return q.Address.Equals(Address); });
+            var Elements = Model.PingWindows.Count(q => { return q.Address.Equals(Address); });
             if( Elements == 0 ) return false;
 
             // Remove Elements
-            var Element = _Model.PingWindows.First(q => { return q.Address.Equals(Address); });
-            _Model.PingWindows.Remove(Element);
+            var Element = Model.PingWindows.First(q => { return q.Address.Equals(Address); });
+            Model.PingWindows.Remove(Element);
 
             // Update Column Count
-            var TotalCount = _Model.PingWindows.Count;
-            if( TotalCount > 8 ) _Model.Columns = 3; // Three windows wide, we can fit about 12 on a 1080 screen before it gets silly
-            else if( TotalCount > 1 ) _Model.Columns = 2;
-            else _Model.Columns = 1;
+            var TotalCount = Model.PingWindows.Count;
+            if( TotalCount > 8 ) Model.Columns = 3; // Three windows wide, we can fit about 12 on a 1080 screen before it gets silly
+            else if( TotalCount > 1 ) Model.Columns = 2;
+            else Model.Columns = 1;
 
             Proj?.TriggerSaveStatus();
             return true;
@@ -314,11 +445,11 @@ namespace PingerTool.Windows
         public bool UpdatePingElementName(IPAddress Address, string NewName)
         {
             // Check it exists
-            var Elements = _Model.PingWindows.Count(q => { return q.Address.Equals(Address); });
+            var Elements = Model.PingWindows.Count(q => { return q.Address.Equals(Address); });
             if( Elements == 0 ) return false;
 
             // Update Name
-            var Element = _Model.PingWindows.First(q => { return q.Address.Equals(Address); });
+            var Element = Model.PingWindows.First(q => { return q.Address.Equals(Address); });
             Element.DisplayName = NewName;
 
             Proj?.TriggerSaveStatus();
@@ -334,19 +465,56 @@ namespace PingerTool.Windows
         public bool UpdatePingElementAddress(IPAddress Address, IPAddress NewAddress)
         {
             // Check it exists
-            var Elements = _Model.PingWindows.Count(q => { return q.Address.Equals(Address); });
+            var Elements = Model.PingWindows.Count(q => { return q.Address.Equals(Address); });
             if( Elements == 0 ) return false;
 
             // Check the new adddress does not exist
-            Elements = _Model.PingWindows.Count( q => { return q.Address.Equals(NewAddress); });
+            Elements = Model.PingWindows.Count( q => { return q.Address.Equals(NewAddress); });
             if( Elements != 0 ) return false;
 
             // Update Address
-            var Element = _Model.PingWindows.First(q => { return q.Address.Equals(Address); });
+            var Element = Model.PingWindows.First(q => { return q.Address.Equals(Address); });
+            var ClonedModel = (PingControlModel)Element.Clone();
             Element.Address = NewAddress;
 
+            // Notify the WebUI and trigger save update
+            Server?.SendWebsocketMessage(ClonedModel, "DELETED");
             Proj?.TriggerSaveStatus();
             return true;
+        }
+
+        /// <summary>
+        /// Pause the specified ping element
+        /// </summary>
+        /// <param name="Address">IP Address of existing element</param>
+        /// <returns>True if successful, false otherwise</returns>
+        public bool PausePingElement(IPAddress Address)
+        {
+            foreach( var PingControl in FindVisualChildren<PingControl>(this) )
+            {
+                if( PingControl.PingAddress != Address ) continue;
+                PingControl.PauseControl();
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Resume the specified ping element
+        /// </summary>
+        /// <param name="Address">IP Address of existing element</param>
+        /// <returns>True if successful, false otherwise</returns>
+        public bool ResumePingElement(IPAddress Address)
+        {
+            foreach( var PingControl in FindVisualChildren<PingControl>(this) )
+            {
+                if( PingControl.PingAddress != Address ) continue;
+                PingControl.ResumeControl();
+                return true;
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -354,8 +522,8 @@ namespace PingerTool.Windows
         /// </summary>
         public void ClearAllElements()
         {
-            _Model.PingWindows.Clear();
-            _Model.Columns = 1;
+            Model.PingWindows.Clear();
+            Model.Columns = 1;
         }
 
         /// <summary>
@@ -364,7 +532,7 @@ namespace PingerTool.Windows
         /// <returns>List of Ping Elements</returns>
         public List<PingControlModel> GetAllElements()
         {
-            return _Model.PingWindows.ToList();
+            return Model.PingWindows.ToList();
         }
         #endregion Public Methods
     }
@@ -381,6 +549,7 @@ namespace PingerTool.Windows
         #region Private Properties
         private string _VersionString;
         private string _CompiledOn;
+        private int _GraphHeight = 100;
         private int _Columns = 1;
         #endregion Private Properties
 
@@ -389,6 +558,25 @@ namespace PingerTool.Windows
         /// Ping Window Collection
         /// </summary>
         public ObservableCollection<PingControlModel> PingWindows { get; set; }
+
+        /// <summary>
+        /// Individual Graph Height
+        /// </summary>
+        public int GraphHeight
+        {
+            get
+            {
+                return _GraphHeight;
+            }
+            set
+            {
+                if (_GraphHeight != value)
+                {
+                    _GraphHeight = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
 
         /// <summary>
         /// Current Application Version
@@ -448,26 +636,5 @@ namespace PingerTool.Windows
         }
 
         #endregion Public Properties
-    }
-
-    public class EmptyListConverter : IValueConverter
-    {
-        #region Custom List length to Visibility Converter
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            // Check the converter is being used in the intended manner
-            if( value.GetType() != typeof(int) || targetType != typeof(Visibility) )
-                throw new ArgumentException("Converter only valid for a int to Visibility connversion");
-
-            // Return visible if the length of the list is >= 1, otherwise return hidden
-            return ( (int)value >= 1 ) ? Visibility.Collapsed : Visibility.Visible;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            // We cant convert from Visibility back into a Collection, thats just not feasible or needed
-            throw new NotImplementedException("Converter only valid for one-way conversion");
-        }
-        #endregion Custom List length to Visibility Converter
     }
 }

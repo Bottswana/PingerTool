@@ -93,14 +93,6 @@ namespace PingerTool.Classes
                 LoggingLevel = Level.All;
             }
 
-            // Configure Event Log
-            var EventLog = new EventLogAppender()
-            {
-                ApplicationName = "PingerTool",
-                Layout          = PatternLayout,
-                Threshold       = Level.Warn
-            };
-
             // Configure File Log
             var LogFile = new FileAppender()
             {
@@ -117,10 +109,9 @@ namespace PingerTool.Classes
 
             // Activate Logging
             PatternLayout.ActivateOptions();
-            EventLog.ActivateOptions();
             LogFile.ActivateOptions();
 
-            BasicConfigurator.Configure(new IAppender[] { EventLog, LogFile });
+            BasicConfigurator.Configure(new IAppender[] { LogFile });
         }
         #endregion Log Configurator
     }

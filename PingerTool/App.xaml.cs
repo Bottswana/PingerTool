@@ -12,8 +12,7 @@ namespace PingerTool
 {
     public partial class App
     {
-        public int WarningTimeframe = 2000;
-        public int TimeoutValue = 2000;
+        public const int MaxContainerLines = 80;
         public Log Log;
 
         #region Initialisation
@@ -134,6 +133,13 @@ namespace PingerTool
                     return false;
                 }
             }
+            else
+            {
+                if( MessageBox.Show("Are you sure you wish to exit?", "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No )
+                {
+                    return false;
+                }
+            }
 
             // Allow shutdown
             return true;
@@ -144,7 +150,7 @@ namespace PingerTool
         /// <summary>
         /// Windows Logoff/Shutdown
         /// </summary>
-        private void _Application_SessionEnding( object sender, SessionEndingCancelEventArgs e )
+        private void _Application_SessionEnding(object sender, SessionEndingCancelEventArgs e)
         {
             if( !ConfirmApplicationShutdown() && e != null )
             {

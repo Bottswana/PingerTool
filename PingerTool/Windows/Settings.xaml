@@ -4,45 +4,132 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:PingerTool.Windows"
+        Icon="/Resources/AppIcon.ico"
         mc:Ignorable="d"
         
         WindowStartupLocation="CenterOwner"
         ResizeMode="CanMinimize"
         Title="Settings"
-        Height="480" 
+        Height="460" 
         Width="410">
     <d:Window.DataContext>
         <!-- Using d prefix so model is bound in designer only. Actual DataContext is bound in constructor in Settings.xaml.cs -->
         <local:SettingsModel/>
     </d:Window.DataContext>
 
-    <Grid FocusManager.FocusedElement="{Binding ElementName=TextBox}">
-        <Label Content="General Settings" HorizontalAlignment="Left" Margin="10,15,0,0" VerticalAlignment="Top" FontSize="18" />
-        
-        <Label Content="Ping Timeout Value (ms):" HorizontalAlignment="Left" Margin="15,60,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="TextBox" Text="{Binding PingTimeout, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Right" Height="23" Margin="0,63,15,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="140" Padding="5,2,0,0"/>
+    <TabControl Padding="0">
+        <TabItem Header="General">
+            <Grid FocusManager.FocusedElement="{Binding ElementName=TextBox}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="85"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                
+                <!-- Header -->
+                <Grid Grid.Row="0" Background="LightGray">
+                    <Label Content="General Settings" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" FontSize="18" />
+                    <Label Content="General timeout and notification settings" HorizontalAlignment="Left" Margin="10,40,0,0" VerticalAlignment="Top" FontSize="12" />
+                </Grid>
 
-        <Label Content="Time Warning Threshold (ms):" HorizontalAlignment="Left" Margin="15,90,0,0" VerticalAlignment="Top"/>
-        <TextBox Text="{Binding WarningThreshold, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Right" Height="23" Margin="0,93,15,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="140" Padding="5,2,0,0"/>
+                <!-- Timeout Values -->
+                <Label Grid.Row="1" Content="Timeout Values" HorizontalAlignment="Left" Margin="15,10,0,0" VerticalAlignment="Top" FontSize="14" />
+                <Label Grid.Row="1" Content="Ping Timeout Value (ms):" HorizontalAlignment="Left" Margin="15,40,0,0" VerticalAlignment="Top"/>
+                <TextBox Grid.Row="1" x:Name="TextBox" Text="{Binding PingTimeout, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Right" Height="23" Margin="0,43,15,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="140" Padding="5,2,0,0"/>
 
-        <Label Content="Webserver Settings" HorizontalAlignment="Left" Margin="10,135,0,0" VerticalAlignment="Top" FontSize="18" />
+                <Label Grid.Row="1" Content="Time Warning Threshold (ms):" HorizontalAlignment="Left" Margin="15,70,0,0" VerticalAlignment="Top"/>
+                <TextBox Grid.Row="1" Text="{Binding WarningThreshold, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Right" Height="23" Margin="0,73,15,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="140" Padding="5,2,0,0"/>
+                
+                <Label Grid.Row="1" Content="Response Graph Height (ms):" HorizontalAlignment="Left" Margin="15,100,0,0" VerticalAlignment="Top"/>
+                <TextBox Grid.Row="1" Text="{Binding GraphHeight, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Right" Height="23" Margin="0,103,15,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="140" Padding="5,2,0,0"/>
 
-        <CheckBox Content="Enable Webserver" IsChecked="{Binding EnableWebserver, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="16,190,0,0" />
-        <CheckBox IsEnabled="{Binding EnableWebserver}" Content="Enable Authentication" IsChecked="{Binding EnableAuth, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="16,215,0,0" />
+                <!-- Notification -->
+                <Label Grid.Row="1" Content="Notification" HorizontalAlignment="Left" Margin="15,130,0,0" VerticalAlignment="Top" FontSize="14" />
+                <CheckBox Grid.Row="1" Content="Enable Audio Notification" IsChecked="{Binding EnableNotification, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,170,0,0" />
+                <Button Grid.Row="1" Content="Test Sound" Margin="0,168,15,0" HorizontalAlignment="Right" VerticalAlignment="Top" Width="75" Click="_SoundTest_Click" />
+                
+                <Label Grid.Row="1" Content="Alert when Timeouts exceed:" HorizontalAlignment="Left" Margin="15,200,0,0" VerticalAlignment="Top"/>
+                <TextBox Grid.Row="1" Text="{Binding TimeoutNoti, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Right" Height="23" Margin="0,203,15,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="140" Padding="5,2,0,0"/>
 
-        <Label Content="Server Bind Address:" HorizontalAlignment="Left" Margin="15,256,0,0" VerticalAlignment="Top"/>
-        <TextBox IsEnabled="{Binding EnableWebserver}" Text="{Binding BindAddress, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Right" Height="23" Margin="0,257,15,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="140" Padding="5,2,0,0"/>
+                <Label Grid.Row="1" Content="Alert when Warnings exceed:" HorizontalAlignment="Left" Margin="15,230,0,0" VerticalAlignment="Top"/>
+                <TextBox Grid.Row="1" Text="{Binding WarningNoti, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Right" Height="23" Margin="0,233,15,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="140" Padding="5,2,0,0"/>
 
-        <Label Content="Allowed Subnets (Comma Seperated):" HorizontalAlignment="Left" Margin="15,287,0,0" VerticalAlignment="Top"/>
-        <TextBox IsEnabled="{Binding EnableWebserver}" Text="{Binding AllowedSubnet, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Right" Height="23" Margin="0,288,15,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="140" Padding="5,2,0,0"/>
+                <Button Grid.Row="1" Content="Save" Margin="15,15,100,15" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="75" Click="_Save_Click" IsDefault="True" />
+                <Button Grid.Row="1" Content="Discard" Margin="15" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="75" IsCancel="True" />
+            </Grid>
+        </TabItem>
+        <TabItem Header="Webserver">
+            <Grid FocusManager.FocusedElement="{Binding ElementName=CheckBox}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="85"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
 
-        <Label Content="Username:" HorizontalAlignment="Left" Margin="15,318,0,0" VerticalAlignment="Top"/>
-        <TextBox IsEnabled="{Binding EnableAuth}" Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Right" Height="23" Margin="0,320,15,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="140" Padding="5,2,0,0"/>
+                <!-- Header -->
+                <Grid Grid.Row="0" Background="LightGray">
+                    <Label Content="Webserver Settings" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" FontSize="18" />
+                    <Label Content="Integrated webserver configuration" HorizontalAlignment="Left" Margin="10,40,0,0" VerticalAlignment="Top" FontSize="12" />
+                </Grid>
 
-        <Label Content="Password:" HorizontalAlignment="Left" Margin="15,350,0,0" VerticalAlignment="Top"/>
-        <PasswordBox x:Name="Password" IsEnabled="{Binding EnableAuth}" HorizontalAlignment="Right" Height="23" Margin="0,352,15,0" VerticalAlignment="Top" Width="140" Padding="5,2,0,0"/>
+                <!-- Webserver Setup -->
+                <CheckBox Grid.Row="1" x:Name="CheckBox" Content="Enable Webserver" IsChecked="{Binding EnableWebserver, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="16,25,0,0" />
+                <CheckBox Grid.Row="1" IsEnabled="{Binding EnableWebserver}" Content="Enable Authentication" IsChecked="{Binding EnableAuth, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="16,55,0,0" />
 
-        <Button Content="Save" HorizontalAlignment="Left" Margin="225,405,0,0" VerticalAlignment="Top" Width="75" Click="_Save_Click" IsDefault="True"/>
-        <Button Content="Discard" HorizontalAlignment="Left" Margin="305,405,0,0" VerticalAlignment="Top" Width="75" Click="_Discard_Click" IsCancel="True"/>
-    </Grid>
+                <Label Grid.Row="1" Content="Server Bind Address:" HorizontalAlignment="Left" Margin="15,90,0,0" VerticalAlignment="Top"/>
+                <TextBox Grid.Row="1" IsEnabled="{Binding EnableWebserver}" Text="{Binding BindAddress, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Right" Height="23" Margin="0,93,15,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="140" Padding="5,2,0,0"/>
+
+                <Label Grid.Row="1" Content="Allowed Subnets (Comma Seperated):" HorizontalAlignment="Left" Margin="15,120,0,0" VerticalAlignment="Top"/>
+                <TextBox Grid.Row="1" IsEnabled="{Binding EnableWebserver}" Text="{Binding AllowedSubnet, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Right" Height="23" Margin="0,123,15,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="140" Padding="5,2,0,0"/>
+
+                <Label Grid.Row="1" Content="Username:" HorizontalAlignment="Left" Margin="15,170,0,0" VerticalAlignment="Top"/>
+                <TextBox Grid.Row="1" IsEnabled="{Binding EnableAuth}" Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Right" Height="23" Margin="0,173,15,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="140" Padding="5,2,0,0"/>
+
+                <Label Grid.Row="1" Content="Password:" HorizontalAlignment="Left" Margin="15,200,0,0" VerticalAlignment="Top"/>
+                <PasswordBox Grid.Row="1" x:Name="Password" IsEnabled="{Binding EnableAuth}" HorizontalAlignment="Right" Height="23" Margin="0,203,15,0" VerticalAlignment="Top" Width="140" Padding="5,2,0,0"/>
+
+                <Button Grid.Row="1" Content="Save" Margin="15,15,100,15" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="75" Click="_Save_Click" IsDefault="True" />
+                <Button Grid.Row="1" Content="Discard" Margin="15" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="75" IsCancel="True" />
+            </Grid>
+        </TabItem>
+        <TabItem Header="Spark">
+            <Grid FocusManager.FocusedElement="{Binding ElementName=CheckBox2}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="85"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Header -->
+                <Grid Grid.Row="0" Background="LightGray">
+                    <Label Content="Cisco Spark" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" FontSize="18" />
+                    <Label Content="Integrate with Spark for group notifications" HorizontalAlignment="Left" Margin="10,40,0,0" VerticalAlignment="Top" FontSize="12" />
+                </Grid>
+
+                <!-- Spark Setup -->
+                <CheckBox Grid.Row="1" x:Name="CheckBox2" Content="Enable Spark Integration" IsChecked="{Binding EnableSpark, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="16,25,0,0" />
+                <Label Grid.Row="1" Content="1: Add the following bot to your Spark Space:" HorizontalAlignment="Left" Margin="13,50,0,0" VerticalAlignment="Top" FontSize="12" />
+                <Label Grid.Row="1" Content="{Binding BotName}" HorizontalAlignment="Left" Margin="13,75,0,0" VerticalAlignment="Top" FontSize="12" />
+
+                <!-- Space Selection -->
+                <Label Grid.Row="1" Content="2> Select your Spark Space:" HorizontalAlignment="Left" Margin="13,105,0,0" VerticalAlignment="Top" FontSize="12" />
+                <Button Grid.Row="1" IsEnabled="{Binding EnableSpark}" Content="Update" Margin="0,140,16,0" HorizontalAlignment="Right" VerticalAlignment="Top" Width="75" Height="22" Click="_Update_Click" />
+                <ComboBox x:Name="Circles" Grid.Row="1" IsEnabled="{Binding EnableSpark}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="16,140,0,0" Width="290" Height="22" ItemsSource="{Binding SparkCircles}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <ComboBoxItem Content="{Binding title}" Padding="0" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+
+                <!-- Settings -->
+                <Label Grid.Row="1" Content="3> Configure notifications:" HorizontalAlignment="Left" Margin="13,170,0,0" VerticalAlignment="Top" FontSize="12" />
+                <Label Grid.Row="1" Content="Alert when Timeouts exceed:" HorizontalAlignment="Left" Margin="15,200,0,0" VerticalAlignment="Top"/>
+                <TextBox Grid.Row="1" IsEnabled="{Binding EnableSpark}" Text="{Binding SparkTimeThreshold}" HorizontalAlignment="Right" Height="23" Margin="0,203,15,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="140" Padding="5,2,0,0"/>
+
+                <Label Grid.Row="1" Content="Alert when Warnings exceed:" HorizontalAlignment="Left" Margin="15,230,0,0" VerticalAlignment="Top"/>
+                <TextBox Grid.Row="1" IsEnabled="{Binding EnableSpark}" Text="{Binding SparkWarnThreshold}" HorizontalAlignment="Right" Height="23" Margin="0,233,15,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="140" Padding="5,2,0,0"/>
+
+                <Button Grid.Row="1" Content="Save" Margin="15,15,100,15" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="75" Click="_Save_Click" IsDefault="True" />
+                <Button Grid.Row="1" Content="Discard" Margin="15" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="75" IsCancel="True" />
+            </Grid>
+        </TabItem>
+    </TabControl>
 </Window>

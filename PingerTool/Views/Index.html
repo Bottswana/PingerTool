@@ -1,0 +1,46 @@
+@Master['Template.html']
+
+@Section['Header']
+PingerTool Dashboard
+@EndSection
+
+@Section['Content']
+
+            <!-- Control Row -->
+            <div class="row" style="margin:0 0 20px 0;">
+                <button type="button" class="btn btn-lg btn-default addCheck" style="font-size:13px">Add New Check</button>
+                <div class="alert alert-info">
+                    <strong>Please wait:</strong> Connecting to the PingerTool remote server
+                </div>
+            </div>
+
+            <!-- Content Row(s) -->
+            <div class="Target">
+
+
+            </div>
+
+            <!-- Ping Check Template -->
+            <div class="Template" style="display:none">
+                <div class="col-lg-4 panel panel-default">
+                    <div class="panel-heading">
+                        <i class="fa fa-stopwatch"></i> &nbsp;<span class="Hostname">Device Hostname</span>
+                        <div class="options dropdown">
+                            <a href="javascript:;" id="UnitDropdown" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-bars" style="color:#aaa;"></i></a>
+                            <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="UnitDropdown">
+                                <li><a href="javascript:;" class="PauseButton toggleCheck">Pause Check</a></li>
+                                <li role="separator" class="divider"></li>
+                                <li><a href="javascript:;" class="editCheck">Edit Check</a></li>
+                                <li><a href="javascript:;" style="color:rgb(169, 68, 66);" class="deleteCheck">Delete Check</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="panel-body">
+                        <div class="info">Last contact: <span class="LastContact">Contact Time</span></div>
+                        <div class="PingData"></div>
+                    </div>
+                </div>
+            </div>
+
+@EndSection

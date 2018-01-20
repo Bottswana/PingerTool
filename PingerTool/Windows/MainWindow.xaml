@@ -3,11 +3,13 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:converters="clr-namespace:PingerTool.Converters"
         xmlns:controls="clr-namespace:PingerTool.Controls"
         xmlns:fa="http://schemas.fontawesome.io/icons/"
         xmlns:local="clr-namespace:PingerTool.Windows"
         PreviewKeyDown="_Window_PreviewKeyDown"
         xmlns:Fluent="urn:fluent-ribbon"
+        Icon="/Resources/AppIcon.ico"
         Closing="_Window_Closing"
         
         WindowState="Maximized"
@@ -21,8 +23,8 @@
     
     <Window.Resources>
 
-        <!-- Custom Converter (Declared in MainWindow.xaml.cs) -->
-        <local:EmptyListConverter x:Key="EmptyListConverter" />
+        <!-- Custom Converter -->
+        <converters:EmptyListConverter x:Key="EmptyListConverter" />
 
         <!-- New Menu Button -->
         <Grid x:Key="BackstageNew" Margin="30,50,30,30">
@@ -30,7 +32,7 @@
             <Label Margin="0,40,0,0" Content="Create a new project with default settings." FontSize="16" FontFamily="Segoe UI Light" />
             <Button Width="100" Height="100" Background="WhiteSmoke" BorderThickness="1" BorderBrush="#FFD5D5D5" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="5,100,0,0" Click="_NewProject_Click">
                 <Grid>
-                    <fa:FontAwesome Icon="FileTextOutline" Foreground="#2b579a" FontSize="40" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,-20,0,0" />
+                    <fa:ImageAwesome Icon="FileTextOutline" Foreground="#2b579a" Width="30" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,-20,0,0" />
                     <TextBlock Text="Create" FontFamily="Segoe UI Light" FontSize="14" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,-25" />
                 </Grid>
             </Button>
@@ -42,7 +44,7 @@
             <Label Margin="0,40,0,0" Content="Open an existing project file. All unsaved changes in the current project will be lost." FontSize="16" FontFamily="Segoe UI Light" />
             <Button Width="100" Height="100" Background="WhiteSmoke" BorderThickness="1" BorderBrush="#FFD5D5D5" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="5,100,0,0" Click="_OpenProject_Click">
                 <Grid>
-                    <fa:FontAwesome Icon="FolderOutlinepenOutline" Foreground="#2b579a" FontSize="40" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,-20,0,0" />
+                    <fa:ImageAwesome Icon="FolderOutlinepenOutline" Foreground="#2b579a" Width="30" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,-20,0,0" />
                     <TextBlock Text="Open" FontFamily="Segoe UI Light" FontSize="14" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,-25" />
                 </Grid>
             </Button>
@@ -54,13 +56,13 @@
             <Label Margin="0,40,0,0" Content="Save all project data into a configuration file" FontSize="16" FontFamily="Segoe UI Light" />
             <Button Width="100" Height="100" Background="WhiteSmoke" BorderThickness="1" BorderBrush="#FFD5D5D5" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="5,100,0,0" Click="_SaveProject_Click">
                 <Grid>
-                    <fa:FontAwesome Icon="FloppyOutline" Foreground="#2b579a" FontSize="40" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,-20,0,0" />
+                    <fa:ImageAwesome Icon="FloppyOutline" Foreground="#2b579a" Width="30" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,-20,0,0" />
                     <TextBlock Text="Save" FontFamily="Segoe UI Light" FontSize="14" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,-25" />
                 </Grid>
             </Button>
             <Button Width="100" Height="100" Background="WhiteSmoke" BorderThickness="1" BorderBrush="#FFD5D5D5" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="125,100,0,0" Click="_SaveAsProject_Click">
                 <Grid>
-                    <fa:FontAwesome Icon="HddOutline" Foreground="#2b579a" FontSize="40" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,-20,0,0" />
+                    <fa:ImageAwesome Icon="HddOutline" Foreground="#2b579a" Width="30" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,-20,0,0" />
                     <TextBlock Text="Save As" FontFamily="Segoe UI Light" FontSize="14" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,-25" />
                 </Grid>
             </Button>
@@ -153,6 +155,11 @@
                     <Fluent:Button x:Name="PauseAll" Header="Pause All" Click="_PauseAll_Click" />
                 </Fluent:RibbonGroupBox>
 
+                <Fluent:RibbonGroupBox Header="Graphs">
+                    <Fluent:Button x:Name="ShGraph" Header="Show" Click="_GraphsOn_Click"/>
+                    <Fluent:Button x:Name="NoGraph" Header="Hide" Click="_GraphsOff_Click"/>
+                </Fluent:RibbonGroupBox>
+                
             </Fluent:RibbonTabItem>
         </Fluent:Ribbon>
 

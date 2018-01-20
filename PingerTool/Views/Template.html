@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title>PingerTool Web</title>
+        <link rel="stylesheet" href="/Resources/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="/Resources/css/bootstrap-dialog.min.css" />
+        <link rel="stylesheet" href="/Resources/css/fontawesome-all.min.css" />
+        <link rel="stylesheet" href="/Resources/css/template.css" />
+
+    </head>
+    <body>
+
+        <!-- Main Content -->
+        <div class="container-fluid">
+            <div class="row">
+                <div class="main">
+                    <div class="topnav"> 
+                        @Section['Header'];
+                        <div class="options dropdown">
+                            <a href="javascript:;" id="UnitDropdown" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-bars fa-lg" style="color:#aaa;"></i></a>
+                            <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="UnitDropdown">
+                                <li><a href="javascript:;" class="pauseAllChecks">Pause All Checks</a></li>
+                                <li><a href="javascript:;" class="resumeAllChecks">Resume All Checks</a></li>
+                                <li role="separator" class="divider"></li>
+                                <li><a href="javascript:;" class="saveChanges">Save Configuration</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="content">  
+                        @Section['Content'];
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Popup Boxes -->
+        <div class="popupOverlay"></div>
+        <div class="popupContainerL">
+            <div class="Contents" style="padding:0;"></div>
+        </div>
+        <div class="popupContainer">
+            <i class="fa fa-exclamation-triangle fa-lg"></i>
+            <div class="Contents"></div>
+            <button>Close</button>
+        </div>
+        <div class="popupContainerConfirm">
+            <i class="fa fa-question-circle fa-lg"></i>
+            <div class="Contents"></div>
+            <button class="confirm">Confirm</button>
+            <button class="cancel">Cancel</button>
+        </div>
+
+        <!-- Page Scripts -->
+        <script src="/Resources/js/resource.js"></script>
+        <script src="/Resources/js/template.js"></script>
+            
+    </body>
+</html>
