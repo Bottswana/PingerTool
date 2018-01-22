@@ -44,10 +44,11 @@
     <SignManifests>false</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
+    <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>PingerTool.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="ControlzEx, Version=2.2.0.4, Culture=neutral, PublicKeyToken=f08b075e934b7045, processorArchitecture=MSIL">
@@ -204,7 +205,6 @@
     <EmbeddedResource Include="Resources\webfonts\fa-solid-900.ttf" />
     <EmbeddedResource Include="Resources\webfonts\fa-solid-900.woff" />
     <EmbeddedResource Include="Resources\webfonts\fa-solid-900.woff2" />
-    <None Include="PingerTool.snk" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

@@ -7,6 +7,7 @@ using SuperWebSocket;
 using Nancy.Security;
 using System.Windows;
 using Newtonsoft.Json;
+using Nancy.ViewEngines;
 using System.Reflection;
 using Nancy.Conventions;
 using Nancy.Bootstrapper;
@@ -26,7 +27,6 @@ using SuperSocket.SocketBase.Config;
  */
 
 #if !DEBUG
-using Nancy.ViewEngines;
 using Nancy.Embedded.Conventions;
 #endif
 
@@ -349,14 +349,14 @@ namespace PingerTool.Classes
         #endregion Favicon
 
         #region Custom Bootstrap
-		/// <summary>
-		/// Configure view load from Embedded Resources
-		/// </summary>
-		protected override void ConfigureApplicationContainer(TinyIoCContainer container)
-		{
-			base.ConfigureApplicationContainer(container);
-			ResourceViewLocationProvider.RootNamespaces.Add(GetType().Assembly, "PingerTool.Views");
-		}
+        /// <summary>
+        /// Configure view load from Embedded Resources
+        /// </summary>
+        protected override void ConfigureApplicationContainer(TinyIoCContainer container)
+        {
+            base.ConfigureApplicationContainer(container);
+            ResourceViewLocationProvider.RootNamespaces.Add(GetType().Assembly, "PingerTool.Views");
+        }
 
         /// <summary>
         /// Configure static resource load from Embedded Resources

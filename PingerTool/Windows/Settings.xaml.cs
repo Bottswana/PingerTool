@@ -144,7 +144,7 @@ namespace PingerTool.Windows
             else if( _Model.EnableWebserver )
             {
                 // Get Password
-                var OldPass = _Window.Server?.AuthDetails[1] ?? "";
+                var OldPass = ( _Window.Server?.AuthDetails[1] != "" ) ? _Window.Server?.AuthDetails[1] : Helpers.SHA256Hash("");
                 var tPassword = ( OldPass != null && OldPass.Length > 0 && Password.Password.Length < 1 ) ? OldPass : Helpers.SHA256Hash(Password.Password);
 
                 // Compare current config versus new config
